@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/utilities" layer(utilities);
+
+* {
+  cursor: none !important;
+}
+
+body {
+  font-family: 'Libre Baskerville', serif;
+  cursor: none;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a, button, input, textarea {
+  cursor: none !important;
+}
+
+html {
+  font-size: 80%;
+  scroll-behavior: smooth;
+}
+
+section {
+  scroll-margin-top: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  section {
+    scroll-margin-top: 4.5rem;
+  }
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Magnetic pull effect for small items */
+.magnetic-item {
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.magnetic-item:hover {
+  transform: scale(1.1);
+}
+
+/* Global Polish */
+::selection {
+  background: rgba(255, 255, 255, 0.99);
+  color: black;
+  text-shadow: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 9999px;
+  border: 2px solid #000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}

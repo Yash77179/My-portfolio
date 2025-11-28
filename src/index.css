@@ -17,6 +17,7 @@ body {
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
 }
 
 a, button, input, textarea {
@@ -26,6 +27,7 @@ a, button, input, textarea {
 html {
   font-size: 80%;
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 section {

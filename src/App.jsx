@@ -111,6 +111,24 @@ function App() {
   const [contactPillStyle, setContactPillStyle] = useState({ left: 0, width: 0 })
   const contactTabRefs = useRef({})
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+  }, [mobileMenuOpen])
+
   // Robust Infinite Scroll Logic
   useEffect(() => {
     const scrollContainer = signalScrollRef.current
@@ -416,7 +434,7 @@ function App() {
 
       {/* Cinematic Mobile Menu Overlay - Symmetrical God Mode */}
       <div 
-        className={`fixed top-0 left-0 w-screen h-dvh z-90 bg-black flex flex-col items-center justify-between pb-10 pt-44 md:hidden menu-overlay overscroll-y-none touch-none ${mobileMenuOpen ? 'open' : ''}`}
+        className={`fixed inset-0 z-90 bg-black flex flex-col items-center justify-between pb-10 pt-32 md:hidden menu-overlay overscroll-none touch-none ${mobileMenuOpen ? 'open' : ''}`}
       >
         {/* Background Grain & Symmetrical Glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -428,7 +446,7 @@ function App() {
         </div>
 
         {/* Menu Links - Perfectly Centered & Symmetrical */}
-        <nav className="relative z-10 flex-1 flex flex-col items-center justify-center gap-8 w-full">
+        <nav className="relative z-10 flex-1 flex flex-col items-center justify-center gap-8 w-full mt-10">
           {navLinks.map((link, index) => (
             <div key={link.href} className="menu-link-item w-full flex justify-center">
               <a

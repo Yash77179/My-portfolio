@@ -499,7 +499,7 @@ function App() {
       </div>
             {/* Animation Section */}
       <section id="home" className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
-        {activeSection === 'home' && (
+        {activeSection === 'home' && isDesktop && (
           <div className="absolute inset-0 w-full h-full z-5" style={{ width: '100vw', height: '100vh' }}>
             <div className="w-full h-full scale-150">
               <Spline scene="https://prod.spline.design/AJmDYoypTxdLn7PY/scene.splinecode" />

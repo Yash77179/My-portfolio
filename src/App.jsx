@@ -161,6 +161,8 @@ function App() {
   useEffect(() => {
     // Custom cursor movement
     const handleMouseMove = (e) => {
+      if (window.innerWidth < 1024) return
+      
       mousePos.current = { x: e.clientX, y: e.clientY }
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`
@@ -299,6 +301,7 @@ function App() {
   // Spotlight Effect Logic
   useEffect(() => {
     const handleMouseMove = (e) => {
+      if (window.innerWidth < 1024) return
       const cards = document.querySelectorAll('.spotlight-card')
       cards.forEach(card => {
         const rect = card.getBoundingClientRect()
@@ -334,7 +337,7 @@ function App() {
       ></div>
       <div
         aria-hidden="true"
-        className="fixed inset-0 -z-10 opacity-40 pointer-events-none grain-layer"
+        className="fixed inset-0 -z-10 opacity-40 pointer-events-none grain-layer hidden md:block"
         style={{
           backgroundImage:
             'radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15), transparent 40%), radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.1), transparent 35%), radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.12), transparent 40%), radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.12), transparent 35%)',
@@ -368,7 +371,7 @@ function App() {
       
       {/* Professional Navbar */}
       <nav className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-100 w-[92vw] md:w-[90vw] lg:w-fit lg:max-w-[calc(100vw-10rem)]" aria-label="Primary">
-        <div className="relative flex items-center justify-between md:justify-start gap-2 md:gap-4 lg:gap-8 h-20 md:h-16 lg:h-18 px-5 md:px-6 lg:px-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full overflow-hidden">
+        <div className="relative flex items-center justify-between md:justify-start gap-2 md:gap-4 lg:gap-8 h-20 md:h-16 lg:h-18 px-5 md:px-6 lg:px-6 bg-black/80 md:bg-white/5 backdrop-blur-md md:backdrop-blur-xl border border-white/10 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full overflow-hidden">
           {/* Noise Texture */}
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none"></div>
           
@@ -442,7 +445,7 @@ function App() {
           {/* Central Axis Line */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-linear-to-b from-transparent via-white/10 to-transparent"></div>
           {/* Central Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-purple-900/20 rounded-full blur-[100px] mix-blend-screen animate-pulse"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-purple-900/20 rounded-full blur-3xl mix-blend-screen"></div>
         </div>
 
         {/* Menu Links - Perfectly Centered & Symmetrical */}

@@ -1,5 +1,13 @@
 * {
-  cursor: none !important;
+  cursor: none;
+}
+
+body.cursor-grab * {
+  cursor: grab !important;
+}
+
+body.cursor-grabbing * {
+  cursor: grabbing !important;
 }
 
 /* Custom cursor */

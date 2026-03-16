@@ -1,14 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=general-sans@200,300,400,500,600,700&display=swap');
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/preflight" layer(base);
 @import "tailwindcss/utilities" layer(utilities);
+
+@theme {
+  --font-sans: "Aratigo", Arial, sans-serif;
+  --font-display: "Aratigo", Arial, sans-serif;
+}
+
+/* Add your Aratigo font-face here once you've placed the font file in public/fonts/ !! */
+/* 
+@font-face {
+  font-family: 'Aratigo';
+  src: url('/fonts/Aratigo.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+*/
 
 * {
   cursor: none !important;
 }
 
 body {
-  font-family: 'Libre Baskerville', serif;
+  font-family: 'Aratigo', Arial, sans-serif;
+  font-weight: 300;
   cursor: none;
   margin: 0;
   min-width: 320px;
@@ -20,13 +36,18 @@ body {
   overscroll-behavior-y: none;
 }
 
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Aratigo', Arial, sans-serif;
+  font-weight: 300;
+}
+
 a, button, input, textarea {
   cursor: none !important;
 }
 
 html {
   font-size: 80%;
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; Removed to avoid conflict with GSAP ScrollTrigger */
   overscroll-behavior-y: none;
 }
 
@@ -77,4 +98,20 @@ section {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #444;
+}
+
+/* Animations for Waitlist Background */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+@keyframes spin-slow-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 60s linear infinite;
 }

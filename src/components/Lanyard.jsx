@@ -88,7 +88,30 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const { nodes, materials } = useGLTF(cardGLB);
   const texture = useTexture(lanyard);
   const cardFaceTexture = useTexture(yashPhoto);
-  cardFaceTexture.flipY = false;
+  
+  // Create a proper repeating texture for the card
+  useEffect(() => {
+    // We want to see the whole width of the image, even if it leaves space top/bottom, 
+    // OR just center it better so the face (on the right) is visible.
+    
+    cardFaceTexture.wrapS = THREE.RepeatWrapping;
+    cardFaceTexture.wrapT = THREE.RepeatWrapping;
+    
+    // Zoom out (scale > 1 makes texture smaller/tiles it, so we see more of it)
+    // Trial and error: 1.5 zooms out enough to likely show full width on a narrow card
+    cardFaceTexture.repeat.set(1.4, 1.4); 
+    
+    // Pivot around the center
+    cardFaceTexture.center.set(0.5, 0.5); 
+    
+    // Fine tune position
+    // If the face is on the right and we see the left, we might need to shift x.
+    // Try shifting slightly to favor the right side if centering isn't enough.
+    cardFaceTexture.offset.set(0.1, 0.05); 
+    
+    cardFaceTexture.flipY = false;
+    cardFaceTexture.needsUpdate = true;
+  }, [cardFaceTexture]);
 
   const [curve] = useState(
     () =>
@@ -216,6 +239,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 clearcoatRoughness={0.15}
                 roughness={0.9}
                 metalness={0.8}
+                // Fix for cropping: force the texture to use proper repeating and centering
+                // If it's still cropped, you might need to adjust the UVs of the model or scale the texture
               />
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />

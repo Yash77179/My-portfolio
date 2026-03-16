@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WindowManagerProvider, useWindowManager } from './WindowManager';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
 import { Window } from './Window';
-import { AnimatePresence } from 'framer-motion';
+import BootScreen from './BootScreen';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Folder, FileText, Code, Github, Mail, User, Monitor, Terminal } from 'lucide-react';
 
-// Import existing components that we want to show
-import About from '../About';
+// Import distinct content components to avoid circular dependencies
+import AboutContent from '../AboutContent';
 import Projects from '../Projects';
 import Contact from '../Contact';
 import Experience from '../Experience';
-import Hero from '../Hero'; // Maybe use Hero as Wallpaper or something? Nah.
 
 // A simple wrapper to contain full-page sections
 const AppWrapper = ({ children }) => (
@@ -20,7 +20,7 @@ const AppWrapper = ({ children }) => (
     </div>
 );
 
-const DesktopContent = () => {
+const DesktopContent = ({ onShutdown }) => {
     const { windows, openWindow, closeWindow } = useWindowManager();
 
     const desktopIcons = [
@@ -28,7 +28,7 @@ const DesktopContent = () => {
             id: 'about', 
             title: 'About Me', 
             icon: <User className="text-blue-400" size={32} />, 
-            component: <AppWrapper><About /></AppWrapper> 
+            component: <AppWrapper><div className="p-10"><AboutContent /></div></AppWrapper> 
         },
         { 
             id: 'projects', 
@@ -81,8 +81,8 @@ const DesktopContent = () => {
 
     return (
         <div 
-            className="fixed inset-0 h-screen w-screen overflow-hidden select-none bg-cover bg-center"
-            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')` }}
+            className="fixed inset-0 h-screen w-screen overflow-hidden select-none bg-cover bg-center animate-in fade-in zoom-in-95 duration-1000"
+            style={{ backgroundImage: `url('https://4kwallpapers.com/images/wallpapers/windows-11-dark-mode-blue-stock-official-3840x2160-5630.jpg')` }}
         >
             {/* Overlay for tint if needed */}
             <div className="absolute inset-0 bg-black/20 pointer-events-none" />
@@ -130,10 +130,32 @@ const DesktopContent = () => {
     );
 };
 
-export default function Desktop() {
+export default function Desktop({ onShutdown }) {
+    const [isBooting, setIsBooting] = useState(true);
+
     return (
-        <WindowManagerProvider>
-            <DesktopContent />
+        <WindowManagerProvider onShutdown={onShutdown}>
+            <AnimatePresence mode="wait">
+                {isBooting ? (
+                    <motion.div
+                        key="boot"
+                        exit={{ opacity: 0, transition: { duration: 0.5 } }}
+                        className="fixed inset-0 z-[10000]"
+                    >
+                        <BootScreen onComplete={() => setIsBooting(false)} />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="desktop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="h-full w-full"
+                    >
+                        <DesktopContent onShutdown={onShutdown} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </WindowManagerProvider>
     );
 }

@@ -1,10 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import Globe from './ui/Globe';
+import AboutContent from './AboutContent';
+import Desktop from './os/Desktop';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Play, Maximize2 } from 'lucide-react';
 
 const About = () => {
+    const [showOS, setShowOS] = useState(false);
+
+    // Lock body scroll when OS is open
+    useEffect(() => {
+        if (showOS) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+            // Small timeout to prevent immediate jumps if necessary, 
+            // but usually unset is fine.
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showOS]);
+
     return (
         <section id="about" className="relative bg-[#050505] text-white pt-32 pb-20 overflow-visible min-h-screen">
+            {/* Launch OS Overlay - Using Portal to escape 3D transforms */}
+            {createPortal(
+                <AnimatePresence>
+                    {showOS && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[9999] bg-black isolate"
+                            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
+                        >
+                            <Desktop onShutdown={() => setShowOS(false)} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
+
             {/* Background Texture - Subtle Grain */}
             <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
 
@@ -73,79 +112,42 @@ const About = () => {
                     </div>
                 }
             >
-                {/* Minimalist "Manifesto" Layout */}
-                <div className="h-full w-full bg-[#080808] rounded-2xl relative overflow-hidden flex flex-col md:flex-row shadow-2xl">
-                    
-                    {/* Left: The Visual / Atmospheric Side */}
-                    <div className="w-full md:w-2/5 relative h-64 md:h-full bg-[#050505] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-white/5">
-                        <Globe />
-                        
-                        {/* Overlay Text */}
-                        <div className="absolute bottom-8 left-8 z-20 pointer-events-none">
-                             <div className="w-12 h-1 bg-white mb-4"></div>
-                             <p className="text-xs text-white/60 tracking-[0.2em] uppercase">
-                                 Global Reach
-                             </p>
-                        </div>
-                    </div>
+                {/* Wrap content + Button */}
+                <div className="relative w-full h-full group">
+                     <AboutContent />
+                     
+                     {/* ALWAYS VISIBLE Floating Action Button - FIXED POSITION on screen when sticky */}
+                     <div 
+                        className="absolute bottom-6 right-6 z-50 pointer-events-auto"
+                     >
+                         <button 
+                            onClick={(e) => { 
+                                e.stopPropagation(); 
+                                e.preventDefault();
+                                setShowOS(true); 
+                            }}
+                            className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:bg-white hover:text-black hover:scale-110 active:scale-95 transition-all duration-300 flex items-center gap-3 group/btn cursor-pointer"
+                            title="Launch Windows 11"
+                            type="button"
+                         >
+                            <Play size={24} className="fill-current" />
+                            <span className="font-bold text-sm whitespace-nowrap">Open OS</span>
+                         </button>
+                     </div>
 
-                    {/* Right: The Narrative Side */}
-                    <div className="w-full md:w-3/5 p-8 md:p-16 flex flex-col justify-center relative bg-[#080808]">
-                        
-                        <div className="absolute top-0 right-0 p-8 opacity-20 hidden md:block">
-                            {/* Decorative architectural lines */}
-                            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="0.5">
-                                <line x1="0" y1="0" x2="100" y2="100" />
-                                <line x1="100" y1="0" x2="0" y2="100" />
-                                <circle cx="50" cy="50" r="40" />
-                            </svg>
-                        </div>
-
-                        <div className="space-y-12 relative z-10">
-                            <div>
-                                <h3 className="text-2xl md:text-4xl leading-tight text-white/90 mb-6">
-                                    I don't just write code. <br/>
-                                    <span className="text-zinc-500 italic">I engineer clarity.</span>
-                                </h3>
-                                <p className="text-lg md:text-xl font-light leading-relaxed text-zinc-400 max-w-lg">
-                                    In a digital world cluttered with noise, I build <span className="text-white border-b border-white/20 pb-0.5">silence</span>. My work is defined not by what I add, but by what I refuse to compromise on: speed, fluidity, and purpose.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-col gap-6">
-                                <div className="flex items-baseline gap-4 group cursor-default">
-                                    <span className="text-xs text-emerald-500">01.</span>
-                                    <div>
-                                        <h4 className="text-sm uppercase tracking-widest text-white mb-1 group-hover:text-emerald-400 transition-colors">Precision</h4>
-                                        <p className="text-xs text-zinc-500">Pixel-perfect implementation of complex designs.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-baseline gap-4 group cursor-default">
-                                    <span className="text-xs text-emerald-500">02.</span>
-                                    <div>
-                                        <h4 className="text-sm uppercase tracking-widest text-white mb-1 group-hover:text-emerald-400 transition-colors">Motion</h4>
-                                        <p className="text-xs text-zinc-500">Physics-based interactions that feel tangible.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-baseline gap-4 group cursor-default">
-                                    <span className="text-xs text-emerald-500">03.</span>
-                                    <div>
-                                        <h4 className="text-sm uppercase tracking-widest text-white mb-1 group-hover:text-emerald-400 transition-colors">Scale</h4>
-                                        <p className="text-xs text-zinc-500">Architecture built for global performance.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="pt-8 border-t border-white/5 flex justify-between items-end">
-                                <div>
-                                    <p className="italic text-2xl text-white/40">Yash Patil</p>
-                                </div>
-                                <div className="text-right">
-                                     <p className="text-[10px] text-zinc-600 uppercase tracking-widest">Est. 2023</p>
-                                </div>
+                     {/* Full Overlay (Hover Effect) */}
+                     <div 
+                        className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-sm rounded-2xl cursor-pointer z-40" 
+                        onClick={() => setShowOS(true)}
+                     >
+                        <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                            <h3 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Windows 11 Experience</h3>
+                            <div className="px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all scale-100 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center gap-2 mx-auto w-fit">
+                                <Maximize2 size={18} />
+                                Tap to Launch OS
                             </div>
                         </div>
-                    </div>
+                     </div>
                 </div>
             </ContainerScroll>
         </section>

@@ -4,7 +4,7 @@ const WindowManagerContext = createContext();
 
 export const useWindowManager = () => useContext(WindowManagerContext);
 
-export const WindowManagerProvider = ({ children }) => {
+export const WindowManagerProvider = ({ children, onShutdown }) => {
   const [windows, setWindows] = useState([]);
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [startMenuOpen, setStartMenuOpen] = useState(false);
@@ -64,7 +64,8 @@ export const WindowManagerProvider = ({ children }) => {
         closeWindow, 
         toggleMinimize, 
         bringToFront,
-        zIndices
+        zIndices,
+        onShutdown
     }}>
       {children}
     </WindowManagerContext.Provider>

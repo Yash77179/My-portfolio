@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/My-portfolio/', // This should match your GitHub repository name
+  base: '/', // Changed from '/My-portfolio/' for Vercel deployment
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

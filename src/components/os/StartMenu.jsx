@@ -3,7 +3,7 @@ import { useWindowManager } from "./WindowManager";
 import { Search, Power } from "lucide-react";
 
 export default function StartMenu() {
-  const { startMenuOpen, setStartMenuOpen } = useWindowManager();
+  const { startMenuOpen, setStartMenuOpen, onShutdown } = useWindowManager();
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -102,7 +102,11 @@ export default function StartMenu() {
                 </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Simulate User</span>
             </div>
-            <button className="p-2 hover:bg-white/50 dark:hover:bg-white/5 rounded-md transition-colors mr-4 text-gray-700 dark:text-gray-300" title="Power">
+            <button 
+                className="p-2 hover:bg-white/50 dark:hover:bg-white/5 rounded-md transition-colors mr-4 text-gray-700 dark:text-gray-300" 
+                title="Power"
+                onClick={onShutdown}
+            >
                 <Power size={18} />
             </button>
         </div>

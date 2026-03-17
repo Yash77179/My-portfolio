@@ -7,18 +7,16 @@ const Hero = React.memo(({ isDesktop }) => {
 
     return (
         <section id="home" className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
-            {isDesktop && (
-                <div className="absolute inset-0 w-full h-full z-0" style={{ width: '100vw', height: '100vh', background: '#000000' }}>
-                    <div className="w-full h-full opacity-60"> {/* Reduced opacity for subtleties */}
-                        <Silk
-                            color="#1B6A73" // Premium Bluish-Green (Deep Teal)
-                            scale={1.2} // Zoomed in a little (decreased scale = larger waves)
-                            speed={1.2}
-                            noiseIntensity={1.0}
-                        />
-                    </div>
+            <div className="absolute inset-0 w-full h-full z-0" style={{ width: '100vw', height: '100vh', background: '#000000' }}>
+                <div className="w-full h-full opacity-60"> {/* Reduced opacity for subtleties */}
+                    <Silk
+                        color="#1B6A73" // Premium Bluish-Green (Deep Teal)
+                        scale={1.2} // Zoomed in a little (decreased scale = larger waves)
+                        speed={1.2}
+                        noiseIntensity={1.0}
+                    />
                 </div>
-            )}
+            </div>
             
             {/* 3D Lanyard Interactive Element */}
             {/* The physics engine drag-math relies on the camera staying near [0,0,30].

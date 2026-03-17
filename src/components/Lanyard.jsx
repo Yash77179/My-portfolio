@@ -215,13 +215,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           <group
             scale={2.25}
             position={[0, -1.2, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
+            onPointerOver={() => { if(!isMobile) hover(true) }}
+            onPointerOut={() => { if(!isMobile) hover(false) }}
             onPointerUp={(e) => {
+              if (isMobile) return;
               try { e.target.releasePointerCapture(e.pointerId); } catch(err) {}
               drag(false);
             }}
             onPointerDown={(e) => {
+              if (isMobile) return;
               try { e.target.setPointerCapture(e.pointerId); } catch(err) {}
               const t = card.current.translation();
               drag(new THREE.Vector3().copy(e.point).sub(new THREE.Vector3(t.x, t.y, t.z)));

@@ -12,8 +12,8 @@ const About = () => {
             {/* Background Texture - Subtle Grain */}
             <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
 
-            {/* Background Decorative Layer - Fixed/Sticky Wrapper */}
-            <div className="absolute inset-0 w-full h-full pointer-events-none">
+            {/* Background Decorative Layer - Fixed/Sticky Wrapper (Hidden on Mobile for Performance) */}
+            <div className="hidden md:block absolute inset-0 w-full h-full pointer-events-none">
                 <div 
                     className="sticky top-0 w-full h-[120vh] overflow-hidden"
                     style={{
@@ -96,15 +96,15 @@ const About = () => {
                         
                         <div className="text-center transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col items-center justify-center h-full w-full relative z-10">
                             
-                            <h3 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-4 drop-shadow-2xl">
-                                enter the <span className="font-serif italic font-light text-cyan-300">experience.</span>
+                            <h3 className="text-3xl md:text-6xl font-bold tracking-tighter text-white mb-4 drop-shadow-2xl">
+                                enter the<br className="md:hidden" /> <span className="font-serif italic font-light text-cyan-300">experience.</span>
                             </h3>
 
-                            <p className="text-white/60 text-xs md:text-sm tracking-[0.3em] uppercase mb-10 font-medium">
+                            <p className="text-white/60 text-[0.6rem] md:text-sm tracking-[0.3em] uppercase mb-8 md:mb-10 font-medium">
                                 Interactive OS Portfolio
                             </p>
 
-                            <button className="relative px-8 py-4 bg-white text-black hover:bg-neutral-200 hover:scale-105 transition-all duration-300 rounded-full font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]">
+                            <button className="relative px-6 md:px-8 py-3 md:py-4 bg-white text-black hover:bg-neutral-200 hover:scale-105 transition-all duration-300 rounded-full font-bold uppercase tracking-[0.2em] text-[0.65rem] md:text-xs flex items-center gap-2 md:gap-3 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]">
                                 <Play size={16} className="fill-black" />
                                 Launch System
                             </button>

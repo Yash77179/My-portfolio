@@ -88,29 +88,21 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const { nodes, materials } = useGLTF(cardGLB);
   const texture = useTexture(lanyard);
   const cardFaceTexture = useTexture(yashPhoto);
-  
-  // Create a proper repeating texture for the card
+
+  // Fix texture mapping - the card model's UVs expect a different aspect ratio
+  // than our tall portrait photo, causing extreme zoom. We scale down vertically.
   useEffect(() => {
-    // We want to see the whole width of the image, even if it leaves space top/bottom, 
-    // OR just center it better so the face (on the right) is visible.
-    
-    cardFaceTexture.wrapS = THREE.RepeatWrapping;
-    cardFaceTexture.wrapT = THREE.RepeatWrapping;
-    
-    // Zoom out (scale > 1 makes texture smaller/tiles it, so we see more of it)
-    // Trial and error: 1.5 zooms out enough to likely show full width on a narrow card
-    cardFaceTexture.repeat.set(1.4, 1.4); 
-    
-    // Pivot around the center
-    cardFaceTexture.center.set(0.5, 0.5); 
-    
-    // Fine tune position
-    // If the face is on the right and we see the left, we might need to shift x.
-    // Try shifting slightly to favor the right side if centering isn't enough.
-    cardFaceTexture.offset.set(0.1, 0.05); 
-    
-    cardFaceTexture.flipY = false;
-    cardFaceTexture.needsUpdate = true;
+    if (cardFaceTexture) {
+      cardFaceTexture.flipY = false;
+      // Precision math for centering without squishing:
+      // Using repeat.x = 1.2 stretches the image out, using 60% of original image width.
+      // And we center that 60% with offset.x = 0.2
+      cardFaceTexture.repeat.set(1.2, 1.2); 
+      cardFaceTexture.offset.set(0.2, -0.1);
+      cardFaceTexture.wrapS = THREE.ClampToEdgeWrapping;
+      cardFaceTexture.wrapT = THREE.ClampToEdgeWrapping;
+      cardFaceTexture.needsUpdate = true;
+    }
   }, [cardFaceTexture]);
 
   const [curve] = useState(
@@ -232,15 +224,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             }}
           >
             <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial
+              <meshStandardMaterial
                 map={cardFaceTexture}
                 map-anisotropy={16}
-                clearcoat={isMobile ? 0 : 1}
-                clearcoatRoughness={0.15}
-                roughness={0.9}
-                metalness={0.8}
-                // Fix for cropping: force the texture to use proper repeating and centering
-                // If it's still cropped, you might need to adjust the UVs of the model or scale the texture
+                roughness={0.6}
+                metalness={0.25}
+                envMapIntensity={0.3}
               />
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />

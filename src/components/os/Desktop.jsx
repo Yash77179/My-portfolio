@@ -5,7 +5,14 @@ import StartMenu from './StartMenu';
 import { Window } from './Window';
 import BootScreen from './BootScreen';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Folder, FileText, Code, Github, Mail, User, Monitor, Terminal } from 'lucide-react';
+import { Github } from 'lucide-react';
+
+// Icons
+import userIcon from '../../assets/windows11iconsV1/windows11iconsV1/folders/user.ico';
+import codeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/code.ico';
+import desktopIcon from '../../assets/windows11iconsV1/windows11iconsV1/folders/desktop.ico';
+import mailIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/mail.ico';
+import terminalIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/terminal.ico';
 
 // Import distinct content components to avoid circular dependencies
 import AboutContent from '../AboutContent';
@@ -21,37 +28,37 @@ const AppWrapper = ({ children }) => (
 );
 
 const DesktopContent = ({ onShutdown }) => {
-    const { windows, openWindow, closeWindow } = useWindowManager();
+    const { windows, openWindow, closeWindow, startMenuOpen } = useWindowManager();
 
     const desktopIcons = [
         { 
             id: 'about', 
             title: 'About Me', 
-            icon: <User className="text-blue-400" size={32} />, 
+            icon: <img src={userIcon} alt="About" className="w-12 h-12" />, 
             component: <AppWrapper><div className="p-10"><AboutContent /></div></AppWrapper> 
         },
         { 
             id: 'projects', 
             title: 'My Projects', 
-            icon: <Code className="text-green-500" size={32} />, 
+            icon: <img src={codeIcon} alt="Projects" className="w-12 h-12" />, 
             component: <AppWrapper><Projects /></AppWrapper> 
         },
         { 
             id: 'experience', 
             title: 'Experience', 
-            icon: <Monitor className="text-purple-500" size={32} />, 
+            icon: <img src={desktopIcon} alt="Experience" className="w-12 h-12" />, 
             component: <AppWrapper><Experience /></AppWrapper>
         },
         { 
             id: 'contact', 
             title: 'Contact', 
-            icon: <Mail className="text-yellow-500" size={32} />, 
+            icon: <img src={mailIcon} alt="Contact" className="w-12 h-12" />, 
             component: <AppWrapper><Contact /></AppWrapper> 
         },
         { 
             id: 'github', 
             title: 'GitHub', 
-            icon: <Github className="text-white fill-black" size={32} />, 
+            icon: <Github className="text-white fill-black w-10 h-10 p-1 bg-black/50 rounded-lg" />, 
             component: (
                 <div className="h-full w-full bg-[#0d1117] text-white p-4">
                     <h2 className="text-xl font-bold mb-4">My GitHub Profile</h2>
@@ -63,7 +70,7 @@ const DesktopContent = ({ onShutdown }) => {
         {
             id: 'terminal',
             title: 'Terminal',
-            icon: <Terminal className="text-gray-300" size={32} />,
+            icon: <img src={terminalIcon} alt="Terminal" className="w-12 h-12" />, 
             component: (
                  <div className="h-full w-full bg-black text-green-500 font-mono p-4 text-sm overflow-auto">
                     <p>Microsoft Windows [Version 10.0.22000.1]</p>
@@ -92,8 +99,8 @@ const DesktopContent = ({ onShutdown }) => {
                 {desktopIcons.map((item) => (
                     <button 
                         key={item.id}
-                        onDoubleClick={() => openWindow(item.id, item.component, item.title, item.icon)}
-                        onTouchEnd={() => openWindow(item.id, item.component, item.title, item.icon)} // Simple touch support
+                        onClick={() => openWindow(item.id, item.component, item.title, item.icon)}
+                        onTouchEnd={() => openWindow(item.id, item.component, item.title, item.icon)} 
                         className="w-[84px] flex flex-col items-center gap-1 p-2 rounded hover:bg-white/10 active:bg-white/20 transition-all group focus:bg-white/20 focus:outline-none ring-0 border border-transparent focus:border-white/20"
                     >
                         <div className="p-2 transition-transform duration-200 group-hover:scale-105 filter drop-shadow-lg">
@@ -124,7 +131,9 @@ const DesktopContent = ({ onShutdown }) => {
             </AnimatePresence>
 
             {/* UI Overlays */}
-            <StartMenu />
+            <AnimatePresence>
+                {startMenuOpen && <StartMenu />}
+            </AnimatePresence>
             <Taskbar />
         </div>
     );

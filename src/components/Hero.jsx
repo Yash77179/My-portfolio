@@ -33,9 +33,34 @@ const Hero = React.memo(({ isDesktop }) => {
 
             {/* Hero Content Overlay */}
             <div className="relative z-50 px-4 md:px-6 py-8 md:py-12 w-full h-full flex flex-col justify-between pointer-events-none">
-                {/* Top left corner - Empty */}
-                <div className="hidden lg:block absolute top-20 md:top-8 lg:top-28 2xl:top-8 left-4 md:left-8">
-                    {/* Elements Removed */}
+                {/* Left Side Editorial Aesthetic */}
+                <div className="hidden lg:flex absolute top-[30%] xl:top-[35%] left-10 xl:left-20 flex-col mix-blend-difference pointer-events-none z-20">
+                    {/* Minimalist Identity Badge */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center relative">
+                            {/* Inner dot */}
+                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                            {/* Rotating orbit */}
+                            <svg className="absolute inset-0 w-full h-full animate-[spin_8s_linear_infinite]" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" />
+                            </svg>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[0.65rem] uppercase tracking-[0.3em] text-white font-bold">Yash</span>
+                            <span className="text-[0.5rem] uppercase tracking-[0.2em] text-white/50">Full Stack Dev</span>
+                        </div>
+                    </div>
+                    
+                    {/* Bold Editorial Typography */}
+                    <h2 className="text-white text-5xl xl:text-[4rem] font-medium tracking-tighter leading-[0.9] -ml-1">
+                        creative<br />
+                        <span className="font-serif italic font-light opacity-90 pl-8 text-white/80">engineer.</span>
+                    </h2>
+                    
+                    {/* Refined Description Statement */}
+                    <p className="mt-8 text-[0.65rem] text-white/60 tracking-widest uppercase max-w-[240px] leading-loose border-l border-white/20 pl-4">
+                        Forging immersive digital ecosystems with raw logic and uncompromising aesthetics.
+                    </p>
                 </div>
 
                 {/* Top right corner - Empty */}

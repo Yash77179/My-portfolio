@@ -1,115 +1,162 @@
 import { useEffect, useRef } from "react";
 import { useWindowManager } from "./WindowManager";
-import { Search, Power } from "lucide-react";
+import { Search, Power, ChevronRight, FileText } from "lucide-react";
+import { motion } from "framer-motion";
+
+// Icons
+import edgeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/tools/edge.ico';
+import wordIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/word.ico';
+import excelIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/excel.ico';
+import powerpointIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/powerpoint.ico';
+import outlookIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/outlook.ico';
+import storeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/store.ico';
+import photosIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/photos.ico';
+import settingsIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/tools/settings.ico';
+import calculatorIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/calculator.ico';
+import solitaireIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/solitaire.ico';
+import paintIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/paint.ico';
+import notepadIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/notepad.ico';
+import calendarIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/calendar.ico';
+import mailIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/mail.ico';
+import terminalIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/terminal.ico';
+import codeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/office/code.ico';
+import spotifyIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/groove.ico';
+import moviesIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/movies.ico';
 
 export default function StartMenu() {
-  const { startMenuOpen, setStartMenuOpen, onShutdown } = useWindowManager();
+  const { startMenuOpen, setStartMenuOpen, onShutdown, openWindow } = useWindowManager();
   const menuRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      // If clicking inside the menu or on the start button (handled in Taskbar usually, but checking here helps)
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        // We rely on the Taskbar's button handler to toggle if clicked there.
-        // But if we click desktop, we should close.
-        // For simplicity, let's just close if it's not the menu itself.
-        // Ideally we check if the target is NOT the start button. 
-        // But since start button is in another component, we might conflict.
-        // Let's rely on Taskbar to handle the toggle and just use a timeout or specific check?
-        // Actually, the toggle in Taskbar might re-open it if we close it here on the same click.
-        // Let's assume Taskbar toggle handles the click on the button.
-      }
-    };
-    // Better: listen for clicks on window, close if not menu and not .start-button
     const clickHandler = (e) => {
+         // Close if clicking outside, BUT NOT if clicking the start button (which toggles it)
          if (startMenuOpen && menuRef.current && !menuRef.current.contains(e.target) && !e.target.closest('button[title="Start"]')) {
              setStartMenuOpen(false);
          }
     }
-
     document.addEventListener("mousedown", clickHandler);
-    return () => {
-      document.removeEventListener("mousedown", clickHandler);
-    };
+    return () => document.removeEventListener("mousedown", clickHandler);
   }, [startMenuOpen, setStartMenuOpen]);
 
-  if (!startMenuOpen) return null;
-
+  const pinnedApps = [
+      { name: 'Edge', icon: edgeIcon, id: 'browser' },
+      { name: 'Word', icon: wordIcon, id: 'word' },
+      { name: 'Excel', icon: excelIcon, id: 'excel' },
+      { name: 'PowerPoint', icon: powerpointIcon, id: 'powerpoint' },
+      { name: 'Mail', icon: mailIcon, id: 'mail' },
+      { name: 'Calendar', icon: calendarIcon, id: 'calendar' },
+      { name: 'Store', icon: storeIcon, id: 'store' },
+      { name: 'Photos', icon: photosIcon, id: 'photos' },
+      { name: 'Settings', icon: settingsIcon, id: 'settings' },
+      { name: 'Solitaire', icon: solitaireIcon, id: 'solitaire' },
+      { name: 'Spotify', icon: spotifyIcon, id: 'spotify' },
+      { name: 'Paint', icon: paintIcon, id: 'paint' },
+      { name: 'Notepad', icon: notepadIcon, id: 'notepad' },
+      { name: 'Calculator', icon: calculatorIcon, id: 'calculator' },
+      { name: 'Terminal', icon: terminalIcon, id: 'terminal' },
+      { name: 'VS Code', icon: codeIcon, id: 'vscode' },
+      { name: 'Movies', icon: moviesIcon, id: 'movies' },
+      { name: 'Outlook', icon: outlookIcon, id: 'outlook' },
+  ];
+  
+  // No need to return null here, AnimatePresence handles specific mounting
+  
   return (
-    <div 
+    <motion.div 
         ref={menuRef}
-        className="fixed bottom-14 left-1/2 -translate-x-1/2 w-[640px] h-[650px] bg-[#f3f3f3]/80 dark:bg-[#202020]/80 backdrop-blur-2xl rounded-xl shadow-2xl border border-white/20 dark:border-gray-700 flex flex-col p-6 animate-in slide-in-from-bottom-4 fade-in duration-200 z-[101]"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0, transition: { duration: 0.25 } }}
+        transition={{ type: "spring", stiffness: 300, damping: 28 }}
+        className="fixed bottom-14 left-1/2 -translate-x-1/2 w-[640px] h-[720px] bg-[#202020]/95 backdrop-blur-3xl rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-8 pb-4 z-[101] text-white select-none overflow-hidden"
+        style={{ transformOrigin: "bottom center" }}
     >
         {/* Search Bar */}
-        <div className="relative mb-8">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-            <input 
-                type="text" 
-                placeholder="Type here to search" 
-                className="w-full pl-10 pr-4 py-2.5 bg-[#fbfbfb] dark:bg-[#2c2c2c] border-b-2 border-blue-500/0 focus:border-blue-500 rounded-t-md focus:outline-none focus:bg-white transition-all text-sm text-gray-800 dark:text-gray-200 font-medium placeholder:text-gray-500"
-            />
+        <div className="px-8 mb-6">
+            <div className="relative group rounded-full bg-[#1a1a1a] border-t border-white/5 border-b border-white/5 shadow-inner flex items-center h-10">
+                <Search className="ml-4 text-gray-400 group-focus-within:text-blue-400 transition-colors" size={18} />
+                <input 
+                    type="text" 
+                    placeholder="Search for apps, settings, and documents" 
+                    className="w-full px-3 py-2 bg-transparent border-none focus:outline-none text-sm text-gray-200 placeholder:text-gray-500 font-normal h-full"
+                    autoFocus
+                />
+            </div>
         </div>
 
         {/* Pinned Section */}
-        <div className="flex-1 overflow-y-auto px-4 -mx-4">
-            <div className="flex justify-between items-center mb-4 px-2">
-                <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">Pinned</h3>
-                <button className="text-xs bg-white/50 dark:bg-[#333] px-2 py-1 rounded shadow-sm border border-gray-200/50 dark:border-gray-600">All apps &gt;</button>
+        <div className="flex-1 px-8 overflow-y-auto custom-scrollbar mb-2">
+            <div className="flex justify-between items-end mb-4 px-2">
+                <h3 className="font-semibold text-sm text-white/90">Pinned</h3>
+                <button className="flex items-center gap-1 text-[11px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded transition-colors text-white/80 border border-white/5 shadow-sm">
+                    All apps <ChevronRight size={10} />
+                </button>
             </div>
-            <div className="grid grid-cols-6 gap-y-6 gap-x-2">
-                {/* Apps Grid */}
-                {['Edge', 'Word', 'Excel', 'PowerPoint', 'Mail', 'Calendar', 'Store', 'Photos', 'Settings', 'Calculator', 'Spotify', 'Netflix', 'ToDo', 'News', 'Maps', 'Camera', 'Weather', 'Clock'].map((name, i) => (
-                    <button key={i} className="flex flex-col items-center gap-2 p-2 rounded hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
-                        <div className="w-8 h-8 bg-blue-600 rounded-sm shadow-sm group-hover:scale-105 transition-transform flex items-center justify-center text-white text-[10px] font-bold">
-                            {name[0]}
-                        </div>
-                        <span className="text-[11px] font-medium text-center text-gray-700 dark:text-gray-300 line-clamp-1">{name}</span>
+            
+            <div className="grid grid-cols-6 gap-y-6 gap-x-2 pb-6">
+                {pinnedApps.map((app, i) => (
+                    <button 
+                        key={i} 
+                        className="flex flex-col items-center gap-2 p-2 rounded hover:bg-white/5 active:bg-white/10 transition-all duration-200 group relative"
+                        onClick={() => {
+                            if (app.id) openWindow(app.id, <div className="p-10 text-white">App Content for {app.name}</div>, app.name, <img src={app.icon} className="w-5 h-5"/>)
+                            setStartMenuOpen(false);
+                        }}
+                    >
+                        <img src={app.icon} alt={app.name} className="w-8 h-8 drop-shadow-md group-hover:scale-110 group-active:scale-95 transition-transform duration-200" />
+                        <span className="text-[11px] font-medium text-center text-gray-300 group-hover:text-white line-clamp-1 w-full leading-tight">{app.name}</span>
                     </button>
                 ))}
             </div>
-        </div>
 
-        {/* Recommended Section */}
-        <div className="mt-8 flex-1 px-4 -mx-4">
-             <div className="flex justify-between items-center mb-4 px-2">
-                <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-200">Recommended</h3>
-                <button className="text-xs bg-white/50 dark:bg-[#333] px-2 py-1 rounded shadow-sm border border-gray-200/50 dark:border-gray-600">More &gt;</button>
-            </div>
-             <div className="grid grid-cols-2 gap-2">
-                {/* Recent Files */}
-                <button className="flex items-center gap-3 p-2 rounded hover:bg-white/50 dark:hover:bg-white/5 text-left transition-colors">
-                    <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center text-orange-600">📄</div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Resume_Final.pdf</span>
-                        <span className="text-xs text-gray-500">2h ago</span>
-                    </div>
-                </button>
-                 <button className="flex items-center gap-3 p-2 rounded hover:bg-white/50 dark:hover:bg-white/5 text-left transition-colors">
-                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center text-blue-600">⚛️</div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Portfolio Project</span>
-                        <span className="text-xs text-gray-500">Yesterday at 4:20 PM</span>
-                    </div>
-                </button>
+            {/* Recommended Section */}
+            <div className="p-2 -mx-2">
+                 <div className="flex justify-between items-end mb-4 px-2">
+                    <h3 className="font-semibold text-sm text-white/90">Recommended</h3>
+                    <button className="flex items-center gap-1 text-[11px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded transition-colors text-white/80 border border-white/5 shadow-sm">
+                        More <ChevronRight size={10} />
+                    </button>
+                </div>
+                 <div className="grid grid-cols-2 gap-1 pb-4">
+                    {/* Recent Files */}
+                    <button className="flex items-center gap-3 p-2 rounded hover:bg-white/5 active:bg-white/10 text-left transition-colors group">
+                        <div className="w-8 h-8 bg-blue-500/10 rounded flex items-center justify-center text-blue-400 group-hover:bg-blue-500/20 transition-colors">
+                            <FileText size={18} className="text-blue-400" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium text-gray-200 group-hover:text-white">Portfolio_Project_Final</span>
+                            <span className="text-[11px] text-gray-500 group-hover:text-gray-400">Recently added</span>
+                        </div>
+                    </button>
+                     <button className="flex items-center gap-3 p-2 rounded hover:bg-white/5 active:bg-white/10 text-left transition-colors group">
+                        <div className="w-8 h-8 rounded flex items-center justify-center bg-gray-700/50">
+                            <img src={settingsIcon} className="w-5 h-5 opacity-90" alt="Settings" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium text-gray-200 group-hover:text-white">Get Started</span>
+                            <span className="text-[11px] text-gray-500 group-hover:text-gray-400">Welcome to Windows 11</span>
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
 
         {/* User bar */}
-        <div className="mt-auto pt-4 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center px-4 -mx-6 bg-[#eaeaea]/30 dark:bg-[#1a1a1a]/30 -mb-6 pb-6 rounded-b-xl">
-            <div className="flex items-center gap-3 hover:bg-white/50 dark:hover:bg-white/5 p-2 rounded-md transition-colors cursor-pointer ml-4">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 overflow-hidden">
-                    {/* Placeholder Avatar */}
+        <div className="mt-auto h-[64px] bg-black/20 border-t border-white/5 flex justify-between items-center px-12 -mx-0">
+            <button className="flex items-center gap-3 hover:bg-white/10 p-2 pl-2 pr-4 rounded-md transition-colors cursor-pointer group">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 overflow-hidden relative border border-white/10 shadow-sm flex items-center justify-center">
+                     <span className="text-[10px] font-bold text-white">YP</span>
                 </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Simulate User</span>
-            </div>
+                <span className="text-xs font-medium text-gray-200 group-hover:text-white">Yash Patil</span>
+            </button>
             <button 
-                className="p-2 hover:bg-white/50 dark:hover:bg-white/5 rounded-md transition-colors mr-4 text-gray-700 dark:text-gray-300" 
+                className="p-2.5 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white active:bg-white/20" 
                 title="Power"
                 onClick={onShutdown}
             >
                 <Power size={18} />
             </button>
         </div>
-    </div>
+    </motion.div>
   );
 }

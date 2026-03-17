@@ -1,49 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ContainerScroll } from './ui/container-scroll-animation';
-import Globe from './ui/Globe';
 import AboutContent from './AboutContent';
-import Desktop from './os/Desktop';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Play, Maximize2 } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const About = () => {
-    const [showOS, setShowOS] = useState(false);
-
-    // Lock body scroll when OS is open
-    useEffect(() => {
-        if (showOS) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-            // Small timeout to prevent immediate jumps if necessary, 
-            // but usually unset is fine.
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [showOS]);
 
     return (
         <section id="about" className="relative bg-[#050505] text-white pt-32 pb-20 overflow-visible min-h-screen">
-            {/* Launch OS Overlay - Using Portal to escape 3D transforms */}
-            {createPortal(
-                <AnimatePresence>
-                    {showOS && (
-                        <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[9999] bg-black isolate"
-                            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
-                        >
-                            <Desktop onShutdown={() => setShowOS(false)} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>,
-                document.body
-            )}
-
             {/* Background Texture - Subtle Grain */}
             <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
 
@@ -102,7 +67,7 @@ const About = () => {
 
             <ContainerScroll
                 titleComponent={
-                    <div className="flex flex-col items-center justify-center mb-10 pointer-events-none relative z-10">
+                    <div className="flex flex-col items-center justify-center mb-10 relative z-10">
                         <span className="text-[10rem] md:text-[15rem] font-bold text-white/5 leading-none absolute -top-20 md:-top-32 select-none">
                             01
                         </span>
@@ -112,40 +77,37 @@ const About = () => {
                     </div>
                 }
             >
-                {/* Wrap content + Button */}
-                <div className="relative w-full h-full group">
-                     <AboutContent />
-                     
-                     {/* ALWAYS VISIBLE Floating Action Button - FIXED POSITION on screen when sticky */}
-                     <div 
-                        className="absolute bottom-6 right-6 z-50 pointer-events-auto"
-                     >
-                         <button 
-                            onClick={(e) => { 
-                                e.stopPropagation(); 
-                                e.preventDefault();
-                                setShowOS(true); 
-                            }}
-                            className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:bg-white hover:text-black hover:scale-110 active:scale-95 transition-all duration-300 flex items-center gap-3 group/btn cursor-pointer"
-                            title="Launch Windows 11"
-                            type="button"
-                         >
-                            <Play size={24} className="fill-current" />
-                            <span className="font-bold text-sm whitespace-nowrap">Open OS</span>
-                         </button>
+                {/* The actual clickable target covering the whole Card bounds. */}
+                <div 
+                    className="relative w-full h-full group overflow-hidden rounded-2xl"
+                >
+                     <div className="w-full h-full pointer-events-none">
+                         <AboutContent />
                      </div>
 
-                     {/* Full Overlay (Hover Effect) */}
+                     {/* Hover overlay - specifically clickable */}
                      <div 
-                        className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-sm rounded-2xl cursor-pointer z-40" 
-                        onClick={() => setShowOS(true)}
+                        onClick={() => { window.location.href = '/os'; }}
+                        className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-md z-[9999] cursor-pointer"
+                        style={{ pointerEvents: 'auto' }}
                      >
-                        <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                            <h3 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Windows 11 Experience</h3>
-                            <div className="px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all scale-100 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center gap-2 mx-auto w-fit">
-                                <Maximize2 size={18} />
-                                Tap to Launch OS
-                            </div>
+                        {/* Vignette effect */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
+                        
+                        <div className="text-center transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col items-center justify-center h-full w-full relative z-10">
+                            
+                            <h3 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-4 drop-shadow-2xl">
+                                enter the <span className="font-serif italic font-light text-cyan-300">experience.</span>
+                            </h3>
+
+                            <p className="text-white/60 text-xs md:text-sm tracking-[0.3em] uppercase mb-10 font-medium">
+                                Interactive OS Portfolio
+                            </p>
+
+                            <button className="relative px-8 py-4 bg-white text-black hover:bg-neutral-200 hover:scale-105 transition-all duration-300 rounded-full font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]">
+                                <Play size={16} className="fill-black" />
+                                Launch System
+                            </button>
                         </div>
                      </div>
                 </div>

@@ -16,6 +16,8 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
       const maxZ = Math.max(0, ...Object.values(zIndices));
       setZIndices(prev => ({ ...prev, [appId]: maxZ + 1 }));
       setActiveWindowId(appId);
+      // Ensure it's not minimized
+      setWindows(prev => prev.map(w => w.id === appId ? { ...w, minimized: false } : w));
   };
 
   const openWindow = (appId, component, title, icon) => {
@@ -28,7 +30,7 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
     }
     
     // Create new
-    const newWindow = { id: appId, component, title, icon, minimized: false };
+    const newWindow = { id: appId, component, title, icon, minimized: false, maximized: false };
     setWindows([...windows, newWindow]);
     bringToFront(appId);
     setStartMenuOpen(false);
@@ -42,16 +44,30 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
   };
 
   const toggleMinimize = (appId) => {
-     setWindows(prev => prev.map(w => {
-        if(w.id === appId) {
-            // If currently active and not minimized, minimize it.
-            // If minimized, restore it.
-            const newMinimized = !w.minimized;
-            if (!newMinimized) bringToFront(appId);
-            return { ...w, minimized: newMinimized };
+    const w = windows.find(w => w.id === appId);
+    if (!w) return;
+
+    if (w.minimized) {
+        // If minimized, restore it
+        bringToFront(appId);
+    } else {
+        // If visible
+        if (activeWindowId === appId) {
+            // If active, minimize it
+            setWindows(prev => prev.map(win => win.id === appId ? { ...win, minimized: true } : win));
+            setActiveWindowId(null);
+        } else {
+            // If backgrounded, bring to front
+            bringToFront(appId);
         }
-        return w;
-     }));
+    }
+  };
+
+  const toggleMaximize = (appId) => {
+    setWindows(prev => prev.map(w => 
+      w.id === appId ? { ...w, maximized: !w.maximized } : w
+    ));
+    bringToFront(appId);
   };
 
   return (
@@ -63,6 +79,7 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
         openWindow, 
         closeWindow, 
         toggleMinimize, 
+        toggleMaximize,
         bringToFront,
         zIndices,
         onShutdown

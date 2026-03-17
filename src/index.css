@@ -41,8 +41,10 @@
 }
 */
 
-* {
-  cursor: none !important;
+@media (min-width: 1024px) {
+  * {
+    cursor: none !important;
+  }
 }
 
 /* Override for Windows OS Page - Restore Default Cursor */
@@ -66,7 +68,6 @@
 body {
   font-family: 'Aratigo', Arial, sans-serif;
   font-weight: 300;
-  cursor: none;
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
@@ -82,8 +83,10 @@ h1, h2, h3, h4, h5, h6, .font-display {
   font-weight: 300;
 }
 
-a, button, input, textarea {
-  cursor: none !important;
+@media (min-width: 1024px) {
+  a, button, input, textarea {
+    cursor: none !important;
+  }
 }
 
 html {

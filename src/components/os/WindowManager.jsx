@@ -1,17 +1,56 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const WindowManagerContext = createContext();
 
 export const useWindowManager = () => useContext(WindowManagerContext);
 
-export const WindowManagerProvider = ({ children, onShutdown }) => {
+export const WindowManagerProvider = ({ children, onShutdown, onRestart, onLock }) => {
   const [windows, setWindows] = useState([]);
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [startMenuOpen, setStartMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false); // Added searchOpen state
   const [calendarOpen, setCalendarOpen] = useState(false);
   
   // Z-index management
   const [zIndices, setZIndices] = useState({});
+
+  // Get initial restored window IDs once on mount
+  const [restoredWindowIds] = useState(() => {
+     try {
+         return JSON.parse(sessionStorage.getItem('open_window_ids') || '[]');
+     } catch(e) { return []; }
+  });
+
+  // Track windows state in session storage for reload retention
+  useEffect(() => {
+      const ids = windows.map(w => w.id);
+      sessionStorage.setItem('open_window_ids', JSON.stringify(ids));
+  }, [windows]);
+
+  // Wrapped setters to ensure only one of startMenu, search, calendar is open at a time
+  const _setStartMenuOpen = (value) => {
+    setStartMenuOpen(value);
+    if (value) {
+      setSearchOpen(false);
+      setCalendarOpen(false);
+    }
+  };
+
+  const _setSearchOpen = (value) => {
+    setSearchOpen(value);
+    if (value) {
+      setStartMenuOpen(false);
+      setCalendarOpen(false);
+    }
+  };
+
+  const _setCalendarOpen = (value) => {
+    setCalendarOpen(value);
+    if (value) {
+      setStartMenuOpen(false);
+      setSearchOpen(false);
+    }
+  };
 
   const bringToFront = (appId) => {
       const maxZ = Math.max(0, ...Object.values(zIndices));
@@ -34,8 +73,9 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
     const newWindow = { id: appId, component, title, icon, minimized: false, maximized: false };
     setWindows([...windows, newWindow]);
     bringToFront(appId);
-    setStartMenuOpen(false);
-    setCalendarOpen(false);
+    _setStartMenuOpen(false); // Use wrapped setter
+    _setCalendarOpen(false); // Use wrapped setter
+    _setSearchOpen(false); // Close search when opening a window
   };
 
   const closeWindow = (appId) => {
@@ -77,16 +117,21 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
         windows, 
         activeWindowId, 
         startMenuOpen, 
-        setStartMenuOpen, 
+        setStartMenuOpen: _setStartMenuOpen, // Export wrapped setter
         calendarOpen,
-        setCalendarOpen,
+        setCalendarOpen: _setCalendarOpen, // Export wrapped setter
+        searchOpen, // Export searchOpen state
+        setSearchOpen: _setSearchOpen, // Export wrapped setter
         openWindow, 
         closeWindow, 
         toggleMinimize, 
         toggleMaximize,
+        restoredWindowIds,
         bringToFront,
         zIndices,
-        onShutdown
+        onShutdown,
+        onRestart,
+        onLock
     }}>
       {children}
     </WindowManagerContext.Provider>

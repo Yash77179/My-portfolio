@@ -15,7 +15,13 @@ import { GlassEffect, GlassFilter } from '../ui/liquid-glass';
 import FileExplorer from './apps/FileExplorer';
 
 export default function Taskbar() {
-  const { startMenuOpen, setStartMenuOpen, activeWindowId, windows, openWindow, toggleMinimize, bringToFront, calendarOpen, setCalendarOpen } = useWindowManager();
+  const { 
+    startMenuOpen, setStartMenuOpen, 
+    searchOpen, setSearchOpen,
+    activeWindowId, windows, 
+    openWindow, toggleMinimize, bringToFront, 
+    calendarOpen, setCalendarOpen, restoredWindowIds
+  } = useWindowManager();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -77,6 +83,16 @@ export default function Taskbar() {
     },
   ];
 
+  useEffect(() => {
+    // Auto restore taskbar apps layout on load
+    apps.forEach(app => {
+        if (restoredWindowIds && restoredWindowIds.includes(app.appId)) {
+            openWindow(app.appId, app.content, app.title, app.icon);
+        }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoredWindowIds]);
+
   return (
     <div className="fixed bottom-4 md:bottom-6 w-full flex justify-center px-4 z-[100] select-none text-white pointer-events-none">
       <GlassFilter />
@@ -99,21 +115,24 @@ export default function Taskbar() {
           <div className="flex flex-1 items-center justify-center gap-1 md:gap-2 h-full">
             <button
                 className={`p-2.5 rounded-2xl transition-all duration-300 hover:bg-white/10 active:scale-90 ${startMenuOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
-                onClick={() => { setStartMenuOpen(!startMenuOpen); setCalendarOpen(false); }}
+                onClick={() => { setStartMenuOpen(!startMenuOpen); setCalendarOpen(false); setSearchOpen(false); }}
                 title="Start"
             >
                 <img src={startIcon} alt="Start" className="w-8 h-8 drop-shadow-md transition-transform hover:scale-110" />
             </button>
 
             {/* Search Bar - Expanded */}
-            <div className="hidden sm:block relative group mx-2">
-                 <div className="flex items-center bg-black/40 hover:bg-black/60 transition-all duration-300 rounded-full px-4 py-2 w-56 border border-white/10 shadow-inner cursor-text ring-1 ring-transparent hover:ring-white/20">
-                    <Search size={14} className="text-white/40 mr-2 group-hover:text-cyan-400 transition-colors" />
+            <div className="hidden sm:block relative group mx-2 pointer-events-auto">
+                 <button 
+                    onClick={() => { setSearchOpen(!searchOpen); setStartMenuOpen(false); setCalendarOpen(false); }}
+                    className={`flex items-center transition-all duration-300 rounded-full px-4 py-2 w-56 border border-white/10 shadow-inner cursor-text ring-1 ring-transparent hover:ring-white/20 ${searchOpen ? 'bg-black/60 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : 'bg-black/40 hover:bg-black/60'}`}
+                 >
+                    <Search size={14} className={`mr-2 transition-colors ${searchOpen ? 'text-cyan-400' : 'text-white/40 group-hover:text-cyan-400'}`} />
                     <span className="text-[13px] text-white/50 font-normal">Search...</span>
                     
                     {/* Visual Flair */}
                     <div className="ml-auto w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-purple-500 opacity-80 animate-pulse"></div>
-                 </div>
+                 </button>
             </div>
 
             <div className="w-[1px] h-6 bg-white/10 mx-1 md:mx-2 rounded-full"></div>
@@ -138,7 +157,7 @@ export default function Taskbar() {
                                 openWindow(app.appId, app.content, app.title, app.icon);
                             }
                         }}
-                        className={`relative p-2.5 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,2.2)] hover:bg-white/10 hover:-translate-y-1 group ${isActive ? 'bg-white/5' : ''} ${isOpen ? 'after:content-[""] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-cyan-400 after:shadow-[0_0_8px_rgba(34,211,238,0.8)]' : ''}`}
+                        className={`relative p-2.5 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,2.2)] hover:bg-white/10 hover:-translate-y-1 group ${isActive ? 'bg-white/5' : ''} ${isOpen ? 'after:content-[""] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-4 after:h-[3px] after:rounded-full after:bg-white/40' : ''}`}
                         title={app.title}
                     >
                        <div className="transition-transform duration-300 active:scale-95 group-hover:scale-110 filter drop-shadow-lg">
@@ -169,9 +188,9 @@ export default function Taskbar() {
 
               {/* Clock */}
               <button 
-                className={`flex flex-col items-end leading-none px-3 py-1.5 hover:bg-white/10 rounded-2xl transition-all duration-300 ${calendarOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
+                className={`flex flex-col items-end leading-none px-3 py-1.5 pointer-events-auto hover:bg-white/10 rounded-2xl transition-all duration-300 ${calendarOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
                 title="CalendarToggle"
-                onClick={() => { setCalendarOpen(!calendarOpen); setStartMenuOpen(false); }}
+                onClick={() => { setCalendarOpen(!calendarOpen); setStartMenuOpen(false); setSearchOpen(false); }}
               >
                   <span className="text-xs font-bold text-white/90">
                     {currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase()}

@@ -52,6 +52,23 @@
   cursor: default !important;
 }
 
+/* Specific overrides for resize handles in OS */
+#windows-desktop .react-resizable-handle-n, 
+#windows-desktop .react-resizable-handle-s,
+#windows-desktop [style*="cursor: ns-resize"] { cursor: ns-resize !important; }
+
+#windows-desktop .react-resizable-handle-e, 
+#windows-desktop .react-resizable-handle-w,
+#windows-desktop [style*="cursor: ew-resize"] { cursor: ew-resize !important; }
+
+#windows-desktop .react-resizable-handle-nw, 
+#windows-desktop .react-resizable-handle-se,
+#windows-desktop [style*="cursor: nwse-resize"] { cursor: nwse-resize !important; }
+
+#windows-desktop .react-resizable-handle-ne, 
+#windows-desktop .react-resizable-handle-sw,
+#windows-desktop [style*="cursor: nesw-resize"] { cursor: nesw-resize !important; }
+
 #windows-desktop a, 
 #windows-desktop button, 
 #windows-desktop .cursor-pointer,
@@ -61,7 +78,8 @@
 
 /* Specific overrides for inputs in OS */
 #windows-desktop input, 
-#windows-desktop textarea {
+#windows-desktop textarea,
+#windows-desktop .cursor-text {
   cursor: text !important;
 }
 

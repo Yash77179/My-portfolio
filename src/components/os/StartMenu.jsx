@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWindowManager } from "./WindowManager";
-import { Search, Power, ChevronRight, FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Power, ChevronRight, FileText, Lock, RotateCcw, LogOut } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Icons
 import edgeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/tools/edge.ico';
@@ -24,8 +24,9 @@ import spotifyIcon from '../../assets/windows11iconsV1/windows11iconsV1/applicat
 import moviesIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/movies.ico';
 
 export default function StartMenu() {
-  const { startMenuOpen, setStartMenuOpen, onShutdown, openWindow } = useWindowManager();
+  const { startMenuOpen, setStartMenuOpen, onShutdown, onRestart, openWindow, onLock } = useWindowManager();
   const menuRef = useRef(null);
+  const [showPowerMenu, setShowPowerMenu] = useState(false);
 
   useEffect(() => {
     const clickHandler = (e) => {
@@ -156,13 +157,46 @@ export default function StartMenu() {
                 </div>
                 <span className="text-xs font-medium text-gray-200 group-hover:text-white">Yash Patil</span>
             </button>
-            <button 
-                className="p-2.5 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white active:bg-white/20" 
-                title="Power"
-                onClick={onShutdown}
-            >
-                <Power size={18} />
-            </button>
+            <div className="relative flex items-center">
+                <button 
+                    className={`p-2.5 rounded-md transition-colors ${showPowerMenu ? 'bg-white/20 text-white' : 'text-gray-400 hover:text-white hover:bg-white/10 active:bg-white/20'}`} 
+                    title="Power"
+                    onClick={(e) => { e.stopPropagation(); setShowPowerMenu(!showPowerMenu); }}
+                >
+                    <Power size={18} />
+                </button>
+                
+                {/* Power Context Menu */}
+                 <AnimatePresence>
+                     {showPowerMenu && (
+                         <motion.div 
+                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                             animate={{ opacity: 1, y: 0, scale: 1 }}
+                             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
+                             className="absolute bottom-[110%] right-0 w-48 bg-[#1e1e1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1 z-50 origin-bottom-right"
+                         >
+                             <button 
+                                 onClick={() => { setShowPowerMenu(false); if (onLock) onLock(); }}
+                                 className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors flex items-center gap-3 text-sm font-medium"
+                             >
+                                 <LogOut size={16} className="text-white/80" /> Lock
+                             </button>
+                             <button 
+                                 onClick={() => { setShowPowerMenu(false); if (onShutdown) onShutdown(); }}
+                                 className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors flex items-center gap-3 text-sm font-medium"
+                             >
+                                 <Power size={16} className="text-white/80" /> Shut down
+                             </button>
+                             <button 
+                                 onClick={() => { setShowPowerMenu(false); if (onRestart) onRestart(); }}
+                                 className="w-full text-left px-4 py-3 hover:bg-white/10 transition-colors flex items-center gap-3 text-sm font-medium"
+                             >
+                                 <RotateCcw size={16} className="text-white/80" /> Restart
+                             </button>
+                         </motion.div>
+                     )}
+                 </AnimatePresence>
+            </div>
         </div>
         </div>
     </motion.div>

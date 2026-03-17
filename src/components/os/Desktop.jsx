@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { WindowManagerProvider, useWindowManager } from './WindowManager';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
+import SearchMenu from './SearchMenu';
 import CalendarFlyout from './CalendarFlyout';
 import { Window } from './Window';
 import BootScreen from './BootScreen';
@@ -30,7 +31,7 @@ const AppWrapper = ({ children }) => (
 );
 
 const DesktopContent = ({ onShutdown }) => {
-    const { windows, openWindow, closeWindow, startMenuOpen, calendarOpen } = useWindowManager();
+    const { windows, openWindow, startMenuOpen, searchOpen, calendarOpen, restoredWindowIds } = useWindowManager();
 
     const desktopIcons = [
         { 
@@ -85,8 +86,18 @@ const DesktopContent = ({ onShutdown }) => {
                     <p>C:\Users\Visitor&gt; _</p>
                  </div>
             )
-        }
+        },
     ];
+
+    useEffect(() => {
+        // Auto restore desktop apps layout on load
+        desktopIcons.forEach(item => {
+            if (restoredWindowIds && restoredWindowIds.includes(item.id)) {
+                openWindow(item.id, item.component, item.title, item.icon);
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [restoredWindowIds]);
 
     return (
         <div className="fixed inset-0 h-screen w-screen overflow-hidden select-none animate-in fade-in zoom-in-95 duration-1000">
@@ -132,22 +143,21 @@ const DesktopContent = ({ onShutdown }) => {
             {/* We map windows here. AnimatePresence handles mounting/unmounting animations */}
             <AnimatePresence>
                 {windows.map((w) => (
-                    !w.minimized && (
-                        <Window 
-                            key={w.id} 
-                            id={w.id} 
-                            title={w.title} 
+                    <Window 
+                        key={w.id} 
+                        id={w.id} 
+                        title={w.title} 
                             icon={w.icon}
                         >
                             {w.component}
                         </Window>
-                    )
                 ))}
             </AnimatePresence>
 
             {/* UI Overlays */}
             <AnimatePresence>
                 {startMenuOpen && <StartMenu />}
+                {searchOpen && <SearchMenu />}
                 {calendarOpen && <CalendarFlyout />}
             </AnimatePresence>
             <Taskbar />
@@ -157,31 +167,71 @@ const DesktopContent = ({ onShutdown }) => {
 };
 
 export default function Desktop({ onShutdown }) {
-    const [isBooting, setIsBooting] = useState(true);
+    const [osState, setOsState] = useState(() => {
+        const state = sessionStorage.getItem('os_boot_state');
+        // If we hard reload while on desktop, keep desktop.
+        if (state === 'desktop') return 'desktop';
+        
+        // If we reload while locked or booting, it implies a fresh hardware boot (clear open apps)
+        sessionStorage.removeItem('open_window_ids');
+        sessionStorage.setItem('os_boot_state', 'booting');
+        return 'booting';
+    });
+    const [bootKey, setBootKey] = useState(0);
+
+    const handleRestart = () => {
+        sessionStorage.removeItem('os_boot_state');
+        sessionStorage.removeItem('open_window_ids');
+        setOsState('booting');
+        setBootKey(prev => prev + 1);
+    };
+
+    const handleShutdown = () => {
+        sessionStorage.removeItem('os_boot_state');
+        sessionStorage.removeItem('open_window_ids');
+        if (onShutdown) onShutdown();
+    };
+
+    const handleLock = () => {
+        sessionStorage.setItem('os_boot_state', 'locked');
+        setOsState('locked');
+    };
+
+    const handleBootComplete = () => {
+        sessionStorage.setItem('os_boot_state', 'desktop');
+        setOsState('desktop');
+    };
 
     return (
-        <WindowManagerProvider onShutdown={onShutdown}>
-            <AnimatePresence mode="wait">
-                {isBooting ? (
+        <WindowManagerProvider key={`wm-${bootKey}`} onShutdown={handleShutdown} onRestart={handleRestart} onLock={handleLock}>
+            <AnimatePresence>
+                {osState !== 'desktop' && (
                     <motion.div
-                        key="boot"
+                        key={`boot-${bootKey}`}
                         exit={{ opacity: 0, transition: { duration: 0.5 } }}
                         className="fixed inset-0 z-[10000]"
                     >
-                        <BootScreen onComplete={() => setIsBooting(false)} />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="desktop"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        className="h-full w-full"
-                    >
-                        <DesktopContent onShutdown={onShutdown} />
+                        <BootScreen 
+                            initialPhase={osState === 'locked' ? 'locked' : 'booting'}
+                            onComplete={handleBootComplete} 
+                            onShutdown={handleShutdown} 
+                            onRestart={handleRestart} 
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>
+            
+            {osState !== 'booting' && (
+                <motion.div
+                    key="desktop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full w-full"
+                >
+                    <DesktopContent onShutdown={handleShutdown} />
+                </motion.div>
+            )}
         </WindowManagerProvider>
     );
 }

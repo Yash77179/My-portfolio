@@ -1,23 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import AboutContent from './AboutContent';
 import { Play } from 'lucide-react';
 
 const About = () => {
+    const navigate = useNavigate();
 
-    const handleLaunchOS = () => {
-        // Must request fullscreen synchronously during the exact click gesture
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(() => {});
+    const handleLaunchOS = async () => {
+        try {
+            // Await the fullscreen promise natively before doing any React DOM routing
+            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            }
+        } catch (error) {
+            console.warn("Fullscreen request was blocked or not supported", error);
+        } finally {
+            // Once the browser natively handles the fullscreen request (success or fail), then transition the UI
+            navigate('/os');
         }
-        
-        // Force a synchronous URL update that React Router will intercept
-        // This is necessary because `navigate()` delays execution to the next React render cycle,
-        // which drops the user interaction token required for the Fullscreen API.
-        window.history.pushState({}, '', '/os');
-        window.dispatchEvent(new Event('popstate'));
     };
 
     return (

@@ -31,19 +31,6 @@ const AppWrapper = ({ children }) => (
 const DesktopContent = ({ onShutdown }) => {
     const { windows, openWindow, closeWindow, startMenuOpen } = useWindowManager();
 
-    // Auto-enter fullscreen upon desktop launch
-    useEffect(() => {
-        const attemptFullscreen = () => {
-            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {
-                    // Silently ignore if blocked by browser's auto-play/gesture policy
-                });
-            }
-        };
-        const timer = setTimeout(attemptFullscreen, 200);
-        return () => clearTimeout(timer);
-    }, []);
-
     const desktopIcons = [
         { 
             id: 'about', 

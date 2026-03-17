@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useWindowManager } from "./WindowManager";
-import { FolderOpen, Settings, Chrome, Terminal, Send, Search, CloudSun, Wifi, Volume2, BatteryMedium, ChevronUp, Mic } from "lucide-react";
+import { FolderOpen, Settings, Chrome, Terminal, Send, Search, CloudSun, Wifi, Volume2, BatteryMedium, ChevronUp, Mic, Maximize, Minimize } from "lucide-react";
 
 // Icons
 import startIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/tools/start.ico';
@@ -11,167 +11,179 @@ import terminalIcon from '../../assets/windows11iconsV1/windows11iconsV1/applica
 import mailIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/mail.ico';
 import storeIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/store.ico';
 
+import { GlassEffect, GlassFilter } from '../ui/liquid-glass';
 import FileExplorer from './apps/FileExplorer';
 
 export default function Taskbar() {
   const { startMenuOpen, setStartMenuOpen, activeWindowId, windows, openWindow, toggleMinimize, bringToFront } = useWindowManager();
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    
+    // Listen for fullscreen changes natively
+    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
   }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+  };
 
   const apps = [
     { 
         title: "File Explorer", 
-        icon: <img src={explorerIcon} alt="Explorer" className="w-[26px] h-[26px]" />, 
+        icon: <img src={explorerIcon} alt="Explorer" className="w-[28px] h-[28px]" />, 
         appId: "explorer", 
         content: <FileExplorer /> 
     },
     { 
         title: "Edge", 
-        icon: <img src={edgeIcon} alt="Edge" className="w-[26px] h-[26px]" />, 
+        icon: <img src={edgeIcon} alt="Edge" className="w-[28px] h-[28px]" />, 
         appId: "browser", 
         content: <div className="p-4">Browser Content</div> 
     },
     {
         title: "Microsoft Store",
-        icon: <img src={storeIcon} alt="Store" className="w-[26px] h-[26px]" />,
+        icon: <img src={storeIcon} alt="Store" className="w-[28px] h-[28px]" />,
         appId: "store",
         content: <div className="p-4">Store Content</div>
     },
     { 
         title: "Terminal", 
-        icon: <img src={terminalIcon} alt="Terminal" className="w-[26px] h-[26px]" />,
+        icon: <img src={terminalIcon} alt="Terminal" className="w-[28px] h-[28px]" />,
         appId: "terminal", 
         content: <div className="bg-black text-green-500 font-mono h-full p-2 text-sm">C:\Users\Visitor&gt; npm install windows-11-portfolio<br/><br/>Installing...<br/>Done!</div> 
     },
     { 
         title: "Mail", 
-        icon: <img src={mailIcon} alt="Mail" className="w-[26px] h-[26px]" />,
+        icon: <img src={mailIcon} alt="Mail" className="w-[28px] h-[28px]" />,
         appId: "mail", 
         content: <div className="p-4">Mail Content</div> 
     },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-12 bg-[#202020]/95 backdrop-blur-2xl border-t border-white/5 flex items-center justify-between px-3 z-[100] select-none text-white">
+    <div className="fixed bottom-4 md:bottom-6 w-full flex justify-center px-4 z-[100] select-none text-white pointer-events-none">
+      <GlassFilter />
       
-      {/* 1. Left: Widgets (Weather) */}
-      <div className="flex-1 flex justify-start items-center">
-          <button className="flex items-center gap-2 hover:bg-white/10 px-2 py-1 rounded-md transition-colors group">
-              <CloudSun size={20} className="text-yellow-100 group-hover:text-yellow-200" />
-              <div className="flex flex-col items-start leading-none">
-                  <span className="text-xs font-medium text-gray-200">26°C</span>
-                  <span className="text-[10px] text-gray-400 group-hover:text-gray-300">Mostly cloudy</span>
-              </div>
-          </button>
-      </div>
+      <GlassEffect className="h-14 md:h-16 px-2 md:px-4 rounded-[32px] pointer-events-auto max-w-full overflow-x-auto overflow-y-hidden shadow-2xl border border-white/5 scrollbar-hide">
+        <div className="flex items-center justify-between w-full gap-4 md:gap-8 h-full">
+          
+          {/* 1. Left: Widgets (Weather) - Hidden on mobile */}
+          <div className="hidden md:flex flex-none justify-start items-center">
+              <button className="flex items-center gap-2 hover:bg-white/10 px-3 py-2 rounded-2xl transition-all duration-300 group">
+                  <CloudSun size={20} className="text-cyan-300 group-hover:drop-shadow-[0_0_8px_rgba(103,232,249,0.8)]" />
+                  <div className="flex flex-col items-start leading-none">
+                      <span className="text-xs font-semibold text-white/90">26°C</span>
+                      <span className="text-[10px] text-white/50">Clear</span>
+                  </div>
+              </button>
+          </div>
 
-      {/* 2. Center: Pinned Apps & Start */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 h-full px-2" style={{ width: 'max-content' }}>
-        {/* Start Button */}
-         <button
-            className={`p-2 rounded-md transition-all duration-200 hover:bg-white/10 active:bg-white/5 ${startMenuOpen ? 'bg-white/10' : ''}`}
-            onClick={() => setStartMenuOpen(!startMenuOpen)}
-            title="Start"
-        >
-            <img src={startIcon} alt="Start" className="w-7 h-7 drop-shadow transition-transform active:scale-90" />
-        </button>
+          {/* 2. Center: Pinned Apps & Start */}
+          <div className="flex flex-1 items-center justify-center gap-1 md:gap-2 h-full">
+            {/* Start Button */}
+            <button
+                className={`p-2.5 rounded-2xl transition-all duration-300 hover:bg-white/10 active:scale-90 ${startMenuOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
+                onClick={() => setStartMenuOpen(!startMenuOpen)}
+                title="Start"
+            >
+                <img src={startIcon} alt="Start" className="w-8 h-8 drop-shadow-md transition-transform hover:scale-110" />
+            </button>
 
-        {/* Search Bar - Expanded */}
-        <div className="relative group mx-1">
-             <div className="flex items-center bg-[#353535] group-hover:bg-[#3f3f3f] transition-colors rounded-full px-3 py-1.5 w-48 border-t border-white/5 shadow-inner cursor-text">
-                <Search size={14} className="text-gray-400 mr-2" />
-                <span className="text-[13px] text-gray-400 font-normal">Search</span>
-                
-                {/* Visual Flair in Search Bar (Right Side) */}
-                <div className="ml-auto flex items-center">
-                     <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 opacity-80" title="Bing Chat"></div>
-                </div>
-             </div>
-        </div>
-        
-        {/* Task View (Optional Placeholder) */}
-         <button className="p-2 rounded-md hover:bg-white/10 transition-all group" title="Task View">
-            {/* Simple geometric representation of Task View */}
-            <div className="w-5 h-5 grid grid-cols-2 gap-[2px]">
-                <div className="bg-gray-400 group-hover:bg-white rounded-[1px] opacity-60"></div>
-                <div className="bg-gray-400 group-hover:bg-white rounded-[1px] opacity-90"></div>
-                <div className="bg-gray-400 group-hover:bg-white rounded-[1px] opacity-90"></div>
-                <div className="bg-gray-400 group-hover:bg-white rounded-[1px] opacity-60"></div>
+            {/* Search Bar - Expanded */}
+            <div className="hidden sm:block relative group mx-2">
+                 <div className="flex items-center bg-black/40 hover:bg-black/60 transition-all duration-300 rounded-full px-4 py-2 w-56 border border-white/10 shadow-inner cursor-text ring-1 ring-transparent hover:ring-white/20">
+                    <Search size={14} className="text-white/40 mr-2 group-hover:text-cyan-400 transition-colors" />
+                    <span className="text-[13px] text-white/50 font-normal">Search...</span>
+                    
+                    {/* Visual Flair */}
+                    <div className="ml-auto w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-purple-500 opacity-80 animate-pulse"></div>
+                 </div>
             </div>
-         </button>
 
+            <div className="w-[1px] h-6 bg-white/10 mx-1 md:mx-2 rounded-full"></div>
 
-         {/* Mapped Apps */}
-         {apps.map((app) => {
-            const windowInstance = windows.find(w => w.id === app.appId);
-            const isOpen = !!windowInstance;
-            const isActive = activeWindowId === app.appId && !windowInstance?.minimized;
-            
-            return (
-                <button
-                    key={app.appId}
-                    onClick={() => {
-                        if (isOpen) {
-                            if (isActive) {
-                                toggleMinimize(app.appId);
+             {/* Mapped Apps */}
+             {apps.map((app) => {
+                const windowInstance = windows.find(w => w.id === app.appId);
+                const isOpen = !!windowInstance;
+                const isActive = activeWindowId === app.appId && !windowInstance?.minimized;
+                
+                return (
+                    <button
+                        key={app.appId}
+                        onClick={() => {
+                            if (isOpen) {
+                                if (isActive) {
+                                    toggleMinimize(app.appId);
+                                } else {
+                                    bringToFront(app.appId);
+                                }
                             } else {
-                                bringToFront(app.appId);
+                                openWindow(app.appId, app.content, app.title, app.icon);
                             }
-                        } else {
-                            openWindow(app.appId, app.content, app.title, app.icon);
-                        }
-                    }}
-                    className={`relative p-2 rounded-md transition-all duration-200 hover:bg-white/10 group ${isActive ? 'bg-white/5' : ''} ${isOpen ? 'after:content-[""] after:absolute after:bottom-0.5 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-0.5 after:rounded-full after:bg-gray-400 after:transition-all hover:after:w-3' : ''}`}
-                    title={app.title}
-                >
-                   <div className={`${isActive ? 'scale-100' : 'scale-100'} transition-transform duration-200 active:scale-90 opacity-90 group-hover:opacity-100`}>
-                       {app.icon}
-                   </div>
-                </button>
-            )
-         })}
-      </div>
+                        }}
+                        className={`relative p-2.5 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,2.2)] hover:bg-white/10 hover:-translate-y-1 group ${isActive ? 'bg-white/5' : ''} ${isOpen ? 'after:content-[""] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-cyan-400 after:shadow-[0_0_8px_rgba(34,211,238,0.8)]' : ''}`}
+                        title={app.title}
+                    >
+                       <div className="transition-transform duration-300 active:scale-95 group-hover:scale-110 filter drop-shadow-lg">
+                           {app.icon}
+                       </div>
+                    </button>
+                )
+             })}
+          </div>
 
-      {/* 3. Right: System Tray */}
-      <div className="flex-1 flex justify-end items-center gap-1">
-          {/* Tray Overflow */}
-          <button className="p-1 hover:bg-white/10 rounded-sm hover:bg-opacity-10">
-              <ChevronUp size={16} className="text-gray-300" />
-          </button>
+          {/* 3. Right: System Tray - Hidden on mobile */}
+          <div className="hidden md:flex flex-none justify-end items-center gap-2">
+              {/* Taskbar Overflow & Fullscreen Toggle */}
+              <button onClick={toggleFullscreen} className="p-1.5 hover:bg-white/10 rounded-full hover:bg-opacity-10 transition-colors" title="Toggle Fullscreen">
+                  {isFullscreen ? <Minimize size={16} className="text-white/60 hover:text-white" /> : <Maximize size={16} className="text-white/60 hover:text-white" />}
+              </button>
+              
+              <button className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                  <ChevronUp size={16} className="text-white/60" />
+              </button>
 
-          <span className="text-xs text-gray-300 px-1 hover:bg-white/10 rounded-sm cursor-pointer p-1">ENG IN</span>
+              {/* Quick Settings Group */}
+              <button className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-2xl transition-all duration-300">
+                  <Wifi size={16} className="text-white/80 hover:text-cyan-300 transition-colors" />
+                  <Volume2 size={16} className="text-white/80 hover:text-cyan-300 transition-colors" />
+                  <BatteryMedium size={16} className="text-white/80 hover:text-green-400 transition-colors" />
+              </button>
 
-          {/* Quick Settings Group */}
-          <button className="flex items-center gap-3 px-2 py-1 hover:bg-white/10 rounded-md transition-colors" title="Internet, Sound, Battery">
-              <Wifi size={16} className="text-gray-200" />
-              <Volume2 size={16} className="text-gray-200" />
-              <BatteryMedium size={16} className="text-gray-200" />
-          </button>
+              {/* Clock */}
+              <button 
+                className="flex flex-col items-end leading-none px-3 py-1.5 hover:bg-white/10 rounded-2xl transition-all duration-300"
+                title={currentTime.toLocaleDateString()}
+              >
+                  <span className="text-xs font-bold text-white/90">
+                    {currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase()}
+                  </span>
+                  <span className="text-[10px] text-white/50">
+                    {currentTime.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' })}
+                  </span>
+              </button>
+          </div>
 
-          {/* Clock */}
-          <button 
-            className="flex flex-col items-end leading-none px-2 py-0.5 hover:bg-white/10 rounded-md transition-colors text-right ml-1"
-            title={currentTime.toLocaleDateString()}
-          >
-              <span className="text-xs font-medium text-gray-100 mb-[1px]">
-                {currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase()}
-              </span>
-              <span className="text-[10px] text-gray-300">
-                {currentTime.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' })}
-              </span>
-          </button>
-          
-          {/* Notification/Bell */}
-          <button className="h-full w-2 flex justify-end items-end ml-1 group" title="Notifications">
-             {/* Invisible area normally */}
-          </button>
-          
-          <div className="w-1 h-full border-l border-white/10 ml-1"></div> {/* Show desktop sliver */}
-      </div>
+        </div>
+      </GlassEffect>
     </div>
   );
 }

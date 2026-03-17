@@ -13,6 +13,7 @@ import codeIcon from '../../assets/windows11iconsV1/windows11iconsV1/application
 import desktopIcon from '../../assets/windows11iconsV1/windows11iconsV1/folders/desktop.ico';
 import mailIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/mail.ico';
 import terminalIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/terminal.ico';
+import bgVideo from '../../assets/Effect.mp4';
 
 // Import distinct content components to avoid circular dependencies
 import AboutContent from '../AboutContent';
@@ -29,6 +30,19 @@ const AppWrapper = ({ children }) => (
 
 const DesktopContent = ({ onShutdown }) => {
     const { windows, openWindow, closeWindow, startMenuOpen } = useWindowManager();
+
+    // Auto-enter fullscreen upon desktop launch
+    useEffect(() => {
+        const attemptFullscreen = () => {
+            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {
+                    // Silently ignore if blocked by browser's auto-play/gesture policy
+                });
+            }
+        };
+        const timer = setTimeout(attemptFullscreen, 200);
+        return () => clearTimeout(timer);
+    }, []);
 
     const desktopIcons = [
         { 
@@ -87,12 +101,25 @@ const DesktopContent = ({ onShutdown }) => {
     ];
 
     return (
-        <div 
-            className="fixed inset-0 h-screen w-screen overflow-hidden select-none bg-cover bg-center animate-in fade-in zoom-in-95 duration-1000"
-            style={{ backgroundImage: `url('https://4kwallpapers.com/images/wallpapers/windows-11-dark-mode-blue-stock-official-3840x2160-5630.jpg')` }}
-        >
+        <div className="fixed inset-0 h-screen w-screen overflow-hidden select-none animate-in fade-in zoom-in-95 duration-1000">
+            {/* Animated Video Background */}
+            <video 
+                className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+            >
+                <source src={bgVideo} type="video/mp4" />
+                {/* Fallback to static image if video fails in some browsers */}
+                <img src="https://4kwallpapers.com/images/wallpapers/windows-11-dark-mode-blue-stock-official-3840x2160-5630.jpg" alt="Windows 11 Background" className="w-full h-full object-cover" />
+            </video>
+
             {/* Overlay for tint if needed */}
-            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/30 pointer-events-none z-10" />
+
+            {/* Desktop Content Layer wrapper */}
+            <div className="absolute inset-0 z-20">
 
             {/* Desktop Icons Grid */}
             <div className="absolute top-4 left-4 flex flex-col gap-6 flex-wrap content-start h-[calc(100vh-60px)] z-0">
@@ -135,6 +162,7 @@ const DesktopContent = ({ onShutdown }) => {
                 {startMenuOpen && <StartMenu />}
             </AnimatePresence>
             <Taskbar />
+            </div>
         </div>
     );
 };

@@ -68,9 +68,16 @@ export default function StartMenu() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0, transition: { duration: 0.25 } }}
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="fixed bottom-14 left-1/2 -translate-x-1/2 w-[640px] h-[720px] bg-[#202020]/95 backdrop-blur-3xl rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-8 pb-4 z-[101] text-white select-none overflow-hidden"
-        style={{ transformOrigin: "bottom center" }}
+        className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[90%] md:w-[640px] h-[720px] max-h-[80vh] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-8 pb-0 z-[101] text-white select-none overflow-hidden"
+        style={{ 
+            transformOrigin: "bottom center",
+            backdropFilter: "blur(40px) saturate(150%)", 
+            WebkitBackdropFilter: "blur(40px) saturate(150%)",
+            background: "linear-gradient(135deg, rgba(35, 35, 35, 0.45) 0%, rgba(10, 10, 10, 0.65) 100%)"
+        }}
     >
+        {/* Start Menu Foreground Elements */}
+        <div className="relative flex flex-col h-full w-full">
         {/* Search Bar */}
         <div className="px-8 mb-6">
             <div className="relative group rounded-full bg-[#1a1a1a] border-t border-white/5 border-b border-white/5 shadow-inner flex items-center h-10">
@@ -142,7 +149,7 @@ export default function StartMenu() {
         </div>
 
         {/* User bar */}
-        <div className="mt-auto h-[64px] bg-black/20 border-t border-white/5 flex justify-between items-center px-12 -mx-0">
+        <div className="mt-auto h-[72px] bg-black/30 border-t border-white/10 flex justify-between items-center px-8 md:px-12 -mx-0">
             <button className="flex items-center gap-3 hover:bg-white/10 p-2 pl-2 pr-4 rounded-md transition-colors cursor-pointer group">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 overflow-hidden relative border border-white/10 shadow-sm flex items-center justify-center">
                      <span className="text-[10px] font-bold text-white">YP</span>
@@ -156,6 +163,7 @@ export default function StartMenu() {
             >
                 <Power size={18} />
             </button>
+        </div>
         </div>
     </motion.div>
   );

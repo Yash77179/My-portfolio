@@ -6,7 +6,8 @@ import { ChevronDown, ChevronUp, BellOff } from 'lucide-react';
 export default function CalendarFlyout() {
     const { calendarOpen, setCalendarOpen } = useWindowManager();
     const flyoutRef = useRef(null);
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [viewDate, setViewDate] = useState(new Date());
+    const realToday = new Date();
 
     useEffect(() => {
         const clickHandler = (e) => {
@@ -21,12 +22,13 @@ export default function CalendarFlyout() {
 
     const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     
-    // Simple mock calendar logic for current month
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    // Simple mock calendar logic for viewed month
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayIndex = new Date(year, month, 1).getDay();
-    const today = new Date().getDate();
+    const today = realToday.getDate();
+    const isCurrentMonth = month === realToday.getMonth() && year === realToday.getFullYear();
 
     const days = [];
     for(let i=0; i<firstDayIndex; i++) days.push(null);
@@ -66,7 +68,7 @@ export default function CalendarFlyout() {
                 <div className="bg-black/20 rounded-2xl p-4 flex flex-col flex-1 transition-all border border-transparent hover:border-white/10">
                      <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
                         <span className="text-sm font-medium text-white/90 drop-shadow-md">
-                            {currentDate.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })}
+                            {realToday.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })}
                         </span>
                         <button className="p-1 hover:bg-white/10 rounded-md transition-colors text-white/60 hover:text-white cursor-pointer">
                             <ChevronDown size={14} />
@@ -75,25 +77,25 @@ export default function CalendarFlyout() {
                      
                      <div className="flex justify-between items-center mb-4 px-1">
                         <span className="text-sm font-semibold text-white/90">
-                            {currentDate.toLocaleDateString([], { month: 'long', year: 'numeric' })}
+                            {viewDate.toLocaleDateString([], { month: 'long', year: 'numeric' })}
                         </span>
                         <div className="flex gap-1">
-                            <button className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white/70 hover:text-white" onClick={()=>setCurrentDate(new Date(year, month-1, 1))}><ChevronUp size={14} /></button>
-                            <button className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white/70 hover:text-white" onClick={()=>setCurrentDate(new Date(year, month+1, 1))}><ChevronDown size={14} /></button>
+                            <button className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white/70 hover:text-white" onClick={()=>setViewDate(new Date(year, month-1, 1))}><ChevronUp size={14} /></button>
+                            <button className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white/70 hover:text-white" onClick={()=>setViewDate(new Date(year, month+1, 1))}><ChevronDown size={14} /></button>
                         </div>
                      </div>
 
                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
                         {daysOfWeek.map(d => <div key={d} className="text-[11px] font-semibold text-white/50 py-1">{d}</div>)}
                      </div>
-                     <div className="grid grid-cols-7 gap-1 text-center">
+                     <div className="grid grid-cols-7 gap-1 text-center h-[210px] items-start content-start">
                         {days.map((d, i) => (
                             <div 
                                 key={i} 
                                 className={`
                                     w-9 h-9 flex items-center justify-center text-[13px] rounded-full mx-auto
                                     ${d === null ? '' : 'hover:bg-white/10 cursor-pointer transition-colors hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:ring-1 hover:ring-white/20'}
-                                    ${d === today && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-cyan-500 text-white font-bold shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:bg-cyan-400' : 'text-white/90'}
+                                    ${d === today && isCurrentMonth ? 'bg-cyan-500 text-white font-bold shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:bg-cyan-400' : 'text-white/90'}
                                 `}
                             >
                                 {d}

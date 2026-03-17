@@ -8,17 +8,20 @@ import { Play } from 'lucide-react';
 const About = () => {
     const navigate = useNavigate();
 
-    const handleLaunchOS = async () => {
-        try {
-            // Await the fullscreen promise natively before doing any React DOM routing
-            if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-                await document.documentElement.requestFullscreen();
-            }
-        } catch (error) {
-            console.warn("Fullscreen request was blocked or not supported", error);
-        } finally {
-            // Once the browser natively handles the fullscreen request (success or fail), then transition the UI
-            navigate('/os');
+    const handleLaunchOS = (e) => {
+        // Stop React from deferring the event
+        if (e && e.nativeEvent) {
+             e.nativeEvent.stopImmediatePropagation();
+        }
+
+        const launch = () => {
+             navigate('/os');
+        };
+
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().then(launch).catch(launch);
+        } else {
+            launch();
         }
     };
 

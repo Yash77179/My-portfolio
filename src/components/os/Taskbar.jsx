@@ -15,7 +15,7 @@ import { GlassEffect, GlassFilter } from '../ui/liquid-glass';
 import FileExplorer from './apps/FileExplorer';
 
 export default function Taskbar() {
-  const { startMenuOpen, setStartMenuOpen, activeWindowId, windows, openWindow, toggleMinimize, bringToFront } = useWindowManager();
+  const { startMenuOpen, setStartMenuOpen, activeWindowId, windows, openWindow, toggleMinimize, bringToFront, calendarOpen, setCalendarOpen } = useWindowManager();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -97,10 +97,9 @@ export default function Taskbar() {
 
           {/* 2. Center: Pinned Apps & Start */}
           <div className="flex flex-1 items-center justify-center gap-1 md:gap-2 h-full">
-            {/* Start Button */}
             <button
                 className={`p-2.5 rounded-2xl transition-all duration-300 hover:bg-white/10 active:scale-90 ${startMenuOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
-                onClick={() => setStartMenuOpen(!startMenuOpen)}
+                onClick={() => { setStartMenuOpen(!startMenuOpen); setCalendarOpen(false); }}
                 title="Start"
             >
                 <img src={startIcon} alt="Start" className="w-8 h-8 drop-shadow-md transition-transform hover:scale-110" />
@@ -170,8 +169,9 @@ export default function Taskbar() {
 
               {/* Clock */}
               <button 
-                className="flex flex-col items-end leading-none px-3 py-1.5 hover:bg-white/10 rounded-2xl transition-all duration-300"
-                title={currentTime.toLocaleDateString()}
+                className={`flex flex-col items-end leading-none px-3 py-1.5 hover:bg-white/10 rounded-2xl transition-all duration-300 ${calendarOpen ? 'bg-white/15 shadow-[inset_0_0_15px_rgba(255,255,255,0.1)]' : ''}`}
+                title="CalendarToggle"
+                onClick={() => { setCalendarOpen(!calendarOpen); setStartMenuOpen(false); }}
               >
                   <span className="text-xs font-bold text-white/90">
                     {currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase()}

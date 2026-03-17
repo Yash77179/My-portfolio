@@ -8,6 +8,7 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
   const [windows, setWindows] = useState([]);
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [startMenuOpen, setStartMenuOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   
   // Z-index management
   const [zIndices, setZIndices] = useState({});
@@ -34,6 +35,7 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
     setWindows([...windows, newWindow]);
     bringToFront(appId);
     setStartMenuOpen(false);
+    setCalendarOpen(false);
   };
 
   const closeWindow = (appId) => {
@@ -76,6 +78,8 @@ export const WindowManagerProvider = ({ children, onShutdown }) => {
         activeWindowId, 
         startMenuOpen, 
         setStartMenuOpen, 
+        calendarOpen,
+        setCalendarOpen,
         openWindow, 
         closeWindow, 
         toggleMinimize, 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { WindowManagerProvider, useWindowManager } from './WindowManager';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
+import CalendarFlyout from './CalendarFlyout';
 import { Window } from './Window';
 import BootScreen from './BootScreen';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -29,7 +30,7 @@ const AppWrapper = ({ children }) => (
 );
 
 const DesktopContent = ({ onShutdown }) => {
-    const { windows, openWindow, closeWindow, startMenuOpen } = useWindowManager();
+    const { windows, openWindow, closeWindow, startMenuOpen, calendarOpen } = useWindowManager();
 
     const desktopIcons = [
         { 
@@ -147,6 +148,7 @@ const DesktopContent = ({ onShutdown }) => {
             {/* UI Overlays */}
             <AnimatePresence>
                 {startMenuOpen && <StartMenu />}
+                {calendarOpen && <CalendarFlyout />}
             </AnimatePresence>
             <Taskbar />
             </div>

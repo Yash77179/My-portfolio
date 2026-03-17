@@ -154,6 +154,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     
     // We only update if physics is running
     if (fixed.current) {
+      // CRITICAL FIX: Clamp the time delta! 
+      // Background tabs can freeze JS execution and return deltas of many seconds, causing simulation NaN blowouts.
+      const safeDelta = Math.min(delta, 0.1);
+
       [j1, j2].forEach(ref => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
         
@@ -164,7 +168,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         
         ref.current.lerped.lerp(
           currentPos,
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+          safeDelta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
         );
       });
 

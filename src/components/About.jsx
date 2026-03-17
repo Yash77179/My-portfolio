@@ -1,11 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import AboutContent from './AboutContent';
 import { Play } from 'lucide-react';
 
 const About = () => {
+    const navigate = useNavigate();
+
+    const handleLaunchOS = () => {
+        // Must request fullscreen synchronously during the click gesture
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
+        
+        // Use client-side routing to prevent a hard reload from resetting the gesture
+        navigate('/os');
+    };
 
     return (
         <section id="about" className="relative bg-[#050505] text-white pt-32 pb-20 overflow-visible min-h-screen">
@@ -87,7 +98,7 @@ const About = () => {
 
                      {/* Hover overlay - specifically clickable */}
                      <div 
-                        onClick={() => { window.location.href = '/os'; }}
+                        onClick={handleLaunchOS}
                         className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-md z-[9999] cursor-pointer"
                         style={{ pointerEvents: 'auto' }}
                      >

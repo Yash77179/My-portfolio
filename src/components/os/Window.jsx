@@ -25,6 +25,106 @@ export const Window = ({ children, id, title, icon }) => {
   const [snapPreview, setSnapPreview] = useState(null);
   const [isInteracting, setIsInteracting] = useState(false);
   const hideSnapMenuTimeout = React.useRef(null);
+  const dragState = React.useRef({
+      isDragging: false,
+      startX: 0,
+      startY: 0,
+      initialX: 0,
+      initialY: 0
+  });
+
+  const handlePointerDown = (e) => {
+      if (e.target.closest('button') || e.target.closest('.snap-menu-button')) {
+          e.stopPropagation(); 
+          return;
+      }
+      
+      try { e.target.setPointerCapture(e.pointerId); } catch(err) {}
+      
+      dragState.current = {
+          isDragging: true,
+          startX: e.clientX,
+          startY: e.clientY,
+          initialX: rndState.x,
+          initialY: rndState.y
+      };
+      
+      setIsInteracting(true);
+      bringToFront(id);
+      setStartMenuOpen(false);
+      
+      if (isMaximized) {
+          const vw = window.innerWidth;
+          const newWidth = preMaxState?.width || 800;
+          const relativeX = e.clientX / vw;
+          const newX = e.clientX - (newWidth * relativeX);
+          const newY = Math.max(0, e.clientY - 20);
+          
+          dragState.current.initialX = newX;
+          dragState.current.initialY = newY;
+          
+          setRndState({ 
+              width: newWidth,
+              height: preMaxState?.height || 500,
+              x: newX, 
+              y: newY 
+          });
+          toggleMaximize(id);
+      }
+  };
+
+  const handlePointerMove = (e) => {
+      if (!dragState.current.isDragging) return;
+      
+      const dx = e.clientX - dragState.current.startX;
+      const dy = e.clientY - dragState.current.startY;
+      
+      const newX = dragState.current.initialX + dx;
+      const newY = Math.max(0, dragState.current.initialY + dy);
+      
+      setRndState(prev => ({ ...prev, x: newX, y: newY }));
+      
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const threshold = 15;
+      const cornerY = 150;
+      const cornerX = 150;
+
+      let nextSnap = null;
+      if (e.clientY <= threshold) {
+          if (e.clientX <= cornerX) nextSnap = 'top-left';
+          else if (e.clientX >= vw - cornerX) nextSnap = 'top-right';
+          else nextSnap = 'maximize';
+      } else if (e.clientX <= threshold) {
+          if (e.clientY <= cornerY) nextSnap = 'top-left';
+          else if (e.clientY >= vh - cornerY) nextSnap = 'bottom-left';
+          else nextSnap = 'left-half';
+      } else if (e.clientX >= vw - threshold) {
+          if (e.clientY <= cornerY) nextSnap = 'top-right';
+          else if (e.clientY >= vh - cornerY) nextSnap = 'bottom-right';
+          else nextSnap = 'right-half';
+      }
+
+      setSnapPreview(nextSnap);
+  };
+
+  const handlePointerUp = (e) => {
+      if (!dragState.current.isDragging) return;
+      dragState.current.isDragging = false;
+      try { e.target.releasePointerCapture(e.pointerId); } catch(err) {}
+      
+      setIsInteracting(false);
+      
+      if (snapPreview) {
+          const action = snapPreview;
+          setSnapPreview(null);
+          if (action === 'maximize') {
+              if (!isMaximized) handleMaximize();
+          } else {
+              snapWindow(action);
+          }
+      }
+  };
 
   const handleMouseEnterSnap = () => {
       if (hideSnapMenuTimeout.current) clearTimeout(hideSnapMenuTimeout.current);
@@ -159,118 +259,7 @@ export const Window = ({ children, id, title, icon }) => {
             x: rndState.x, 
             y: rndState.y 
         }}
-        className={`!absolute ${!isInteracting ? 'transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]' : ''}`}
-        onDragStart={(e, d) => {
-            setIsInteracting(true);
-            bringToFront(id);
-            setStartMenuOpen(false);
-        }}
-        onDrag={(e, d) => {
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            
-            if (isMaximized) {
-                // Instantly un-maximize and calculate a realistic drag offset. 
-                // We use delta from initial to prevent cursor jumping
-                const mouseX = e.clientX ?? (e.touches && e.touches[0].clientX) ?? vw / 2;
-                const mouseY = e.clientY ?? (e.touches && e.touches[0].clientY) ?? 50;
-                const newWidth = preMaxState?.width || 800;
-                
-                // Keep the cursor at the same relative position on the title bar
-                const relativeX = mouseX / vw;
-                
-                // Immediately revert to windowed mode
-                setRndState({ 
-                    width: newWidth,
-                    height: preMaxState?.height || 500,
-                    x: mouseX - (newWidth * relativeX), 
-                    y: Math.max(0, mouseY - 20) 
-                });
-                toggleMaximize(id);
-                return;
-            }
-            
-            const threshold = 15;
-            const cornerY = 150;
-            const cornerX = 150;
-            const clientX = e.clientX ?? (e.touches && e.touches[0].clientX) ?? vw / 2;
-            const clientY = e.clientY ?? (e.touches && e.touches[0].clientY) ?? 50;
-
-            if (clientY <= threshold) {
-                if (clientX <= cornerX) setSnapPreview('top-left');
-                else if (clientX >= vw - cornerX) setSnapPreview('top-right');
-                else setSnapPreview('maximize');
-            } else if (clientX <= threshold) {
-                if (clientY <= cornerY) setSnapPreview('top-left');
-                else if (clientY >= vh - cornerY) setSnapPreview('bottom-left');
-                else setSnapPreview('left-half');
-            } else if (clientX >= vw - threshold) {
-                if (clientY <= cornerY) setSnapPreview('top-right');
-                else if (clientY >= vh - cornerY) setSnapPreview('bottom-right');
-                else setSnapPreview('right-half');
-            } else {
-                setSnapPreview(null);
-            }
-        }}
-        onDragStop={(e, d) => {
-            setSnapPreview(null);
-            setIsInteracting(false);
-            
-            // Prevent disappearing into top bar
-            let finalY = Math.max(0, d.y);
-            let finalX = d.x;
-            
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            const threshold = 15;
-            const cornerY = 150;
-            const cornerX = 150;
-
-            const clientX = e.clientX ?? (e.changedTouches && e.changedTouches[0].clientX) ?? vw / 2;
-            const clientY = e.clientY ?? (e.changedTouches && e.changedTouches[0].clientY) ?? 50;
-            
-            let action = null;
-            if (clientY <= threshold) {
-                if (clientX <= cornerX) action = 'top-left';
-                else if (clientX >= vw - cornerX) action = 'top-right';
-                else action = 'maximize';
-            } else if (clientX <= threshold) {
-                if (clientY <= cornerY) action = 'top-left';
-                else if (clientY >= vh - cornerY) action = 'bottom-left';
-                else action = 'left-half';
-            } else if (clientX >= vw - threshold) {
-                if (clientY <= cornerY) action = 'top-right';
-                else if (clientY >= vh - cornerY) action = 'bottom-right';
-                else action = 'right-half';
-            }
-
-            if (action === 'maximize') {
-                if (!isMaximized) {
-                    handleMaximize();
-                }
-                return;
-            } else if (action === 'left-half') {
-                snapWindow('left-half');
-                return;
-            } else if (action === 'right-half') {
-                snapWindow('right-half');
-                return;
-            } else if (action === 'top-left') {
-                snapWindow('top-left');
-                return;
-            } else if (action === 'top-right') {
-                snapWindow('top-right');
-                return;
-            } else if (action === 'bottom-left') {
-                snapWindow('bottom-left');
-                return;
-            } else if (action === 'bottom-right') {
-                snapWindow('bottom-right');
-                return;
-            }
-            
-            setRndState(prev => ({ ...prev, x: finalX, y: finalY }));
-        }}
+        className="!absolute"
         onResizeStart={() => setIsInteracting(true)}
         onResizeStop={(e, dir, ref, delta, pos) => {
             setIsInteracting(false);
@@ -278,7 +267,7 @@ export const Window = ({ children, id, title, icon }) => {
                 setRndState({ width: ref.offsetWidth, height: ref.offsetHeight, x: pos.x, y: Math.max(0, pos.y) });
             }
         }}
-        disableDragging={false}
+        disableDragging={true}
         enableResizing={!isMaximized}
         resizeHandleStyles={{
             bottom: { height: '8px', bottom: '-4px', cursor: 'ns-resize' },
@@ -309,23 +298,23 @@ export const Window = ({ children, id, title, icon }) => {
             transition={{ duration: 0.2 }}
             className={`w-full h-full relative flex flex-col overflow-hidden transition-shadow duration-200 border border-white/10 ${isActive ? 'shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/20' : 'shadow-lg'} ${!shouldRemoveRadius ? 'rounded-2xl' : ''}`}
             style={{ 
-                backdropFilter: "blur(40px) saturate(150%)", 
-                WebkitBackdropFilter: "blur(40px) saturate(150%)",
-                background: "linear-gradient(135deg, rgba(20, 20, 20, 0.5) 0%, rgba(5, 5, 5, 0.7) 100%)",
-                boxShadow: "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 2px 0 rgba(255, 255, 255, 0.05)"
+                backdropFilter: isInteracting ? "none" : "blur(40px) saturate(150%)", 
+                WebkitBackdropFilter: isInteracting ? "none" : "blur(40px) saturate(150%)",
+                background: isInteracting ? "rgba(20, 20, 20, 0.95)" : "linear-gradient(135deg, rgba(20, 20, 20, 0.5) 0%, rgba(5, 5, 5, 0.7) 100%)",
+                boxShadow: isInteracting ? "none" : "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 2px 0 rgba(255, 255, 255, 0.05)",
+                willChange: isInteracting ? "transform, opacity" : "auto"
             }}
         >
             <div className="relative flex flex-col h-full w-full">
             {/* Title Bar */}
             <div 
-                className="h-10 min-h-[40px] drag-handle bg-white/5 flex items-center justify-between select-none cursor-default border-b border-white/10" 
+                className="h-10 min-h-[40px] drag-handle bg-white/5 flex items-center justify-between select-none cursor-default border-b border-white/10"
+                style={{ touchAction: 'none' }}
                 onDoubleClick={handleMaximize}
-                onPointerDownCapture={(e) => {
-                    // Prevent drag if clicking buttons
-                    if (e.target.closest('button') || e.target.closest('.snap-menu-button')) {
-                        e.stopPropagation(); 
-                    }
-                }}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
             >
                 <div className="flex items-center gap-3 px-3 flex-1 h-full">
                     {icon && <span className="flex items-center justify-center w-[16px] h-[16px] flex-shrink-0 [&>img]:w-full [&>img]:h-full [&>img]:object-contain">{icon}</span>}

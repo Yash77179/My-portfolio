@@ -69,7 +69,7 @@ export default function StartMenu() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0, transition: { duration: 0.25 } }}
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[90%] md:w-[640px] h-[720px] max-h-[80vh] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-8 pb-0 z-[101] text-white select-none overflow-hidden"
+        className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-[90%] md:w-[640px] h-[720px] max-h-[80vh] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-8 pb-0 z-[100000] text-white select-none overflow-hidden"
         style={{ 
             transformOrigin: "bottom center",
             backdropFilter: "blur(40px) saturate(150%)", 

@@ -41,7 +41,7 @@ export default function CalendarFlyout() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0, transition: { duration: 0.25 } }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="fixed bottom-[96px] right-4 md:right-8 w-[360px] max-h-[85vh] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col z-[101] text-white select-none overflow-hidden"
+            className="fixed bottom-[96px] right-4 md:right-8 w-[360px] max-h-[85vh] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col z-[100000] text-white select-none overflow-hidden"
             style={{ 
                 transformOrigin: "bottom right",
                 backdropFilter: "blur(40px) saturate(150%)", 

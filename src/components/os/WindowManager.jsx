@@ -64,27 +64,23 @@ export const WindowManagerProvider = ({ children, onShutdown, onRestart, onLock 
   };
 
   const openWindow = (appId, component, title, icon) => {
-    // If minimized, restore
-    const existing = windows.find((w) => w.id === appId);
-    if (existing) {
-      bringToFront(appId);
-      setWindows(prev => prev.map(w => w.id === appId ? { ...w, minimized: false } : w));
-      return;
-    }
+    setWindows(prev => {
+        const existing = prev.find((w) => w.id === appId);
+        if (existing) {
+            return prev.map(w => w.id === appId ? { ...w, minimized: false } : w);
+        }
+        return [...prev, { id: appId, component, title, icon, minimized: false, maximized: false }];
+    });
     
-    // Create new
-    const newWindow = { id: appId, component, title, icon, minimized: false, maximized: false };
-    setWindows([...windows, newWindow]);
     bringToFront(appId);
-    _setStartMenuOpen(false); // Use wrapped setter
-    _setCalendarOpen(false); // Use wrapped setter
-    _setSearchOpen(false); // Close search when opening a window
+    _setStartMenuOpen(false); 
+    _setCalendarOpen(false); 
+    _setSearchOpen(false); 
   };
 
   const closeWindow = (appId) => {
     setWindows(prev => prev.filter((w) => w.id !== appId));
-    // ADDED: Clean up Zustand geometry for closed window
-    removeWindowGeometry(appId);
+    // ADDED: Note - intentionally not calling removeWindowGeometry(appId) so position persists!
     if (activeWindowId === appId) {
       setActiveWindowId(null);
     }

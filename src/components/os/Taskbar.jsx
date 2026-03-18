@@ -94,10 +94,10 @@ export default function Taskbar() {
   }, [restoredWindowIds]);
 
   return (
-    <div className="fixed bottom-4 md:bottom-6 w-full flex justify-center px-4 z-[100] select-none text-white pointer-events-none">
+    <div className="fixed bottom-4 md:bottom-6 w-full flex justify-center px-4 z-[99999] select-none text-white pointer-events-none">
       <GlassFilter />
       
-      <GlassEffect className="h-14 md:h-16 px-2 md:px-4 rounded-[32px] pointer-events-auto max-w-full overflow-x-auto overflow-y-hidden shadow-2xl border border-white/5 scrollbar-hide">
+      <GlassEffect className="h-14 md:h-16 px-2 md:px-4 rounded-xl pointer-events-auto max-w-full overflow-x-auto overflow-y-hidden shadow-2xl border border-white/5 scrollbar-hide">
         <div className="flex items-center justify-between w-full gap-4 md:gap-8 h-full">
           
           {/* 1. Left: Widgets (Weather) - Hidden on mobile */}

@@ -39,7 +39,17 @@ function Home() {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
+    
+    // Force DOM jump to top on mount
     window.scrollTo(0, 0);
+
+    // Completely nuke the browser's cached scroll 'Y' coordinates BEFORE it refreshes
+    const handleBeforeUnload = () => {
+        window.scrollTo(0, 0);
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
   // Initialize Lenis Smooth Scroll (ONLY FOR DESKTOP/MICE)

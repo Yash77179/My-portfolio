@@ -54,6 +54,7 @@ const About = () => {
                         <video
                             ref={videoRef}
                             className="w-full h-full object-cover"
+                            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
                             src={yashVideo}
                             autoPlay
                             loop
@@ -67,7 +68,7 @@ const About = () => {
             <ContainerScroll
                 titleComponent={
                     <div className="flex flex-col items-center justify-center mb-10 relative z-10">
-                        <span className="text-[10rem] md:text-[15rem] font-bold text-white/5 leading-none absolute -top-20 md:-top-32 select-none">
+                        <span className="text-[10rem] md:text-[15rem] font-bold text-white/15 leading-none absolute -top-20 md:-top-32 select-none">
                             01
                         </span>
                         <h2 className="text-4xl md:text-7xl font-medium tracking-tight text-white relative z-10">

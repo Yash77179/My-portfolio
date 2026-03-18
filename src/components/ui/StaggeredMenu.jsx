@@ -79,7 +79,6 @@ export const StaggeredMenu = ({
 
   const buildOpenTimeline = useCallback(() => {
     const panel = panelRef.current;
-    const layers = preLayerElsRef.current;
     if (!panel) return null;
 
     openTlRef.current?.kill();
@@ -87,80 +86,58 @@ export const StaggeredMenu = ({
       closeTweenRef.current.kill();
       closeTweenRef.current = null;
     }
-    itemEntranceTweenRef.current?.kill();
 
     const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
-    const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
     const socialTitle = panel.querySelector('.sm-socials-title');
     const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
+    const panelStart = position === 'left' ? -100 : 100;
 
-    const layerStates = layers.map(el => ({ el, start: Number(gsap.getProperty(el, 'xPercent')) }));
-    const panelStart = Number(gsap.getProperty(panel, 'xPercent'));
-
-    if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-    if (numberEls.length) gsap.set(numberEls, { ['--sm-num-opacity']: 0 });
+    // Reset initial states for a minimal, clean fade/slide
+    if (itemEls.length) gsap.set(itemEls, { y: 20, opacity: 0 });
     if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-    if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+    if (socialLinks.length) gsap.set(socialLinks, { y: 10, opacity: 0 });
 
     const tl = gsap.timeline({ paused: true });
 
-    layerStates.forEach((ls, i) => {
-      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
-    });
-
-    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.07 : 0;
-    const panelInsertTime = lastTime + (layerStates.length ? 0.08 : 0);
-    const panelDuration = 0.65;
-
+    // Single sleek panel slide (removed heavy pre-layers)
     tl.fromTo(
       panel,
       { xPercent: panelStart },
-      { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
-      panelInsertTime
+      { xPercent: 0, duration: 0.4, ease: 'power3.out' },
+      0
     );
 
+    // Fade in text naturally without heavy rotation math
     if (itemEls.length) {
-      const itemsStartRatio = 0.15;
-      const itemsStart = panelInsertTime + panelDuration * itemsStartRatio;
-
       tl.to(
         itemEls,
-        { yPercent: 0, rotate: 0, duration: 1, ease: 'power4.out', stagger: { each: 0.1, from: 'start' } },
-        itemsStart
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.05 },
+        0.2
       );
-
-      if (numberEls.length) {
-        tl.to(
-          numberEls,
-          { duration: 0.6, ease: 'power2.out', ['--sm-num-opacity']: 1, stagger: { each: 0.08, from: 'start' } },
-          itemsStart + 0.1
-        );
-      }
     }
 
     if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.4;
-
-      if (socialTitle) tl.to(socialTitle, { opacity: 1, duration: 0.5, ease: 'power2.out' }, socialsStart);
+      const socialsStart = 0.3;
+      if (socialTitle) tl.to(socialTitle, { opacity: 1, duration: 0.3 }, socialsStart);
       if (socialLinks.length) {
         tl.to(
           socialLinks,
           {
             y: 0,
             opacity: 1,
-            duration: 0.55,
-            ease: 'power3.out',
-            stagger: { each: 0.08, from: 'start' },
+            duration: 0.3,
+            ease: 'power2.out',
+            stagger: 0.05,
             onComplete: () => gsap.set(socialLinks, { clearProps: 'opacity' })
           },
-          socialsStart + 0.04
+          socialsStart + 0.1
         );
       }
     }
 
     openTlRef.current = tl;
     return tl;
-  }, []);
+  }, [position]);
 
   const playOpen = useCallback(() => {
     if (busyRef.current) return;
@@ -179,34 +156,20 @@ export const StaggeredMenu = ({
   const playClose = useCallback(() => {
     openTlRef.current?.kill();
     openTlRef.current = null;
-    itemEntranceTweenRef.current?.kill();
 
     const panel = panelRef.current;
-    const layers = preLayerElsRef.current;
     if (!panel) return;
 
-    const all = [...layers, panel];
     closeTweenRef.current?.kill();
 
     const offscreen = position === 'left' ? -100 : 100;
 
-    closeTweenRef.current = gsap.to(all, {
+    closeTweenRef.current = gsap.to(panel, {
       xPercent: offscreen,
-      duration: 0.32,
-      ease: 'power3.in',
+      duration: 0.3,
+      ease: 'power2.inOut',
       overwrite: 'auto',
       onComplete: () => {
-        const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
-        if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-
-        const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
-        if (numberEls.length) gsap.set(numberEls, { ['--sm-num-opacity']: 0 });
-
-        const socialTitle = panel.querySelector('.sm-socials-title');
-        const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
-        if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-        if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
-
         busyRef.current = false;
       }
     });
@@ -355,27 +318,12 @@ export const StaggeredMenu = ({
         data-position={position}
         data-open={open || undefined}
       >
+        {/* Pre-layers entirely removed to reduce staggering GSAP overhead on mobile/laptop */}
         <div
           ref={preLayersRef}
           className="sm-prelayers absolute top-0 right-0 bottom-0 pointer-events-none z-[5]"
           aria-hidden="true"
         >
-          {(() => {
-            if (!colors || colors.length === 0) return null;
-            const raw = colors.slice(0, 4);
-            let arr = [...raw];
-            if (arr.length >= 3) {
-              const mid = Math.floor(arr.length / 2);
-              arr.splice(mid, 1);
-            }
-            return arr.map((c, i) => (
-              <div
-                key={i}
-                className="sm-prelayer absolute top-0 right-0 h-full w-full translate-x-0"
-                style={{ background: c }}
-              />
-            ));
-          })()}
         </div>
 
         <header
@@ -447,6 +395,7 @@ export const StaggeredMenu = ({
                       href={it.link}
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}
+                      onClick={closeMenu}
                     >
                       <span className="sm-panel-itemLabel inline-block [transform-origin:50%_100%] will-change-transform">
                         {it.label}
@@ -478,6 +427,7 @@ export const StaggeredMenu = ({
                         href={s.link}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={closeMenu}
                         className="sm-socials-link text-[1.2rem] font-medium text-white no-underline relative inline-block py-[2px] transition-[color,opacity] duration-300 ease-linear"
                       >
                         {s.label}

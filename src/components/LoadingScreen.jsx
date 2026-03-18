@@ -1,36 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { m } from "framer-motion";
-
-const SpiralAnimation = React.lazy(() => 
-    import("./ui/spiral-animation").then(module => ({ default: module.SpiralAnimation }))
-);
+import loadingVideo from "../assets/loading.webm";
 
 const LoadingScreen = ({ onComplete }) => {
-    const [isExiting, setIsExiting] = useState(false);
     const [hideCanvas, setHideCanvas] = useState(false);
+    const [triggered, setTriggered] = useState(false);
 
-    useEffect(() => {
-        // Start the scatter effect after 3.5 seconds
-        const exitTimer = setTimeout(() => {
-            setIsExiting(true);
-        }, 3500); 
-
-        // Crossfade to the bare matte panels right as scatter ends
-        const hideTimer = setTimeout(() => {
+    const handleTimeUpdate = (e) => {
+        const video = e.target;
+        // If we have less than 1.0 second remaining in the video and haven't triggered yet
+        if (!triggered && video.duration > 0 && (video.duration - video.currentTime <= 1.0)) {
+            setTriggered(true);
             setHideCanvas(true);
-        }, 4700);
-
-        // Finally, trigger the panels to elegantly split open
-        const completeTimer = setTimeout(() => {
             onComplete();
-        }, 5000); 
-
-        return () => {
-            clearTimeout(exitTimer);
-            clearTimeout(hideTimer);
-            clearTimeout(completeTimer);
         }
-    }, [onComplete]);
+    };
+
+    // Hardware safety fallback: In case a native browser blocks autoPlay (e.g. iOS Low Power Mode)
+    useEffect(() => {
+        if (triggered) return;
+        const failSafeTimer = setTimeout(() => {
+            setHideCanvas(true);
+            onComplete();
+        }, 8000); 
+
+        return () => clearTimeout(failSafeTimer);
+    }, [triggered, onComplete]);
 
     return (
         <m.div
@@ -67,16 +62,28 @@ const LoadingScreen = ({ onComplete }) => {
                 </div>
             </m.div>
 
-            {/* Stars Canvas Overlay */}
+            {/* Stars Video Overlay */}
             <m.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: hideCanvas ? 0 : 1 }}
                 transition={{ duration: hideCanvas ? 0.4 : 1.5, ease: "easeOut" }}
-                className="absolute inset-0 z-[60]"
+                className="absolute inset-0 z-[60] flex items-center justify-center"
             >
-                <React.Suspense fallback={null}>
-                    <SpiralAnimation isExiting={isExiting} />
-                </React.Suspense>
+                <video 
+                    className="w-full h-full object-cover"
+                    src={loadingVideo} 
+                    autoPlay 
+                    muted 
+                    playsInline 
+                    onTimeUpdate={handleTimeUpdate}
+                    onEnded={() => {
+                        if (!triggered) {
+                            setTriggered(true);
+                            setHideCanvas(true);
+                            onComplete();
+                        }
+                    }}
+                />
             </m.div>
 
         </m.div>

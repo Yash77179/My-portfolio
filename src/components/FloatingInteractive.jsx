@@ -47,8 +47,9 @@ const FloatingInteractive = () => {
 
             <motion.div
                 ref={ref}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
+                onPointerMove={handleMouseMove}
+                onPointerLeave={handleMouseLeave}
+                onPointerCancel={handleMouseLeave}
                 style={{ 
                     rotateX, 
                     rotateY, 

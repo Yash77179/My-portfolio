@@ -1,14 +1,14 @@
 import React from 'react';
-import Globe from './ui/Globe';
-import { MarqueeDemo } from './ui/marquee-demo';
 
 const AboutContent = () => {
     return (
         <div className="h-full w-full bg-[#080808] rounded-[2rem] md:rounded-2xl relative overflow-hidden flex flex-col md:flex-row shadow-2xl">
             {/* Left: The Visual / Atmospheric Side */}
             <div className="w-full md:w-2/5 relative h-56 md:h-full bg-[#050505] overflow-hidden border-b md:border-b-0 md:border-r border-white/5">
-                {/* Globe/Earth Animation - Primary Visual */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none z-0"><Globe /></div>
+                {/* Static atmosphere to save 3D rendering overhead natively */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none z-0">
+                    <div className="w-64 h-64 md:w-80 md:h-80 bg-gradient-to-tr from-cyan-500/20 to-purple-500/10 rounded-full blur-[80px]" />
+                </div>
                 
                 {/* Gradient Overlay for text readability */}
                 <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />
@@ -42,10 +42,7 @@ const AboutContent = () => {
                     </p>
                 </div>
 
-                {/* Edge-to-edge Marquee Container */}
-                <div className="mt-auto -mx-6 md:-mx-16 w-[calc(100%+3rem)] md:w-[calc(100%+8rem)] overflow-hidden pt-4 border-t border-white/5">
-                    <MarqueeDemo />
-                </div>
+                {/* Removed Marquee slider to save nested mobile animation draw-calls */}
             </div>
         </div>
     );

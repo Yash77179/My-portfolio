@@ -34,8 +34,25 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true)
 
   const [isPhysicsReady, setIsPhysicsReady] = useState(false)
-  // Initialize Lenis Smooth Scroll
+  // Immediate top-level scroll purge to prevent the browser from saving/caching the previous scroll location on reloads
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Initialize Lenis Smooth Scroll (ONLY FOR DESKTOP/MICE)
+  useEffect(() => {
+    // ⚠️ CRITICAL FIX: Running Lenis on touch devices creates a lethal struggle between 
+    // native glass/hardware scroll physics (iOS/Android) and JavaScript math. Bypass it!
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia("(pointer: coarse)").matches);
+    
+    if (isTouchDevice) {
+        // Just keep GSAP ScrollTrigger synchronized natively with hardware scroll
+        return; 
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
@@ -43,24 +60,22 @@ function Home() {
       gestureDirection: 'vertical',
       smooth: true,
       mouseMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-    })
+    });
 
-    lenis.on('scroll', ScrollTrigger.update)
+    lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
-      lenis.raf(time * 1000)
-    })
+      lenis.raf(time * 1000);
+    });
     
-    gsap.ticker.lagSmoothing(0)
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      lenis.destroy()
-      lenis.off('scroll', ScrollTrigger.update)
-      gsap.ticker.remove((time) => lenis.raf(time * 1000))
-    }
-  }, [])
+      lenis.destroy();
+      lenis.off('scroll', ScrollTrigger.update);
+      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+    };
+  }, []);
 
   // Intersection Observer for Active Section
   useEffect(() => {
@@ -99,34 +114,45 @@ function Home() {
 
   // Spotlight Effect Logic — throttled with RAF to avoid forced layout thrashing
   useEffect(() => {
-    let rafId = null
-    let lastX = 0, lastY = 0
+    let rafId = null;
+    let lastX = 0, lastY = 0;
+    // Cache the DOM query so we aren't rebuilding node lists every tick
+    let cachedCards = null;
 
     const updateSpotlight = () => {
-      if (window.innerWidth < 1024) return
-      const cards = document.querySelectorAll('.spotlight-card')
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect()
-        card.style.setProperty('--mouse-x', `${lastX - rect.left}px`)
-        card.style.setProperty('--mouse-y', `${lastY - rect.top}px`)
-      })
-      rafId = null
-    }
-
-    const handleMouseMove = (e) => {
-      lastX = e.clientX
-      lastY = e.clientY
-      if (!rafId) {
-        rafId = requestAnimationFrame(updateSpotlight)
+      if (!cachedCards) {
+          cachedCards = Array.from(document.querySelectorAll('.spotlight-card'));
       }
-    }
+      
+      cachedCards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        // Only trigger layout properties if the card is actively intersecting the viewport bounding box
+        if (rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0) {
+            card.style.setProperty('--mouse-x', `${lastX - rect.left}px`);
+            card.style.setProperty('--mouse-y', `${lastY - rect.top}px`);
+        }
+      });
+      rafId = null;
+    };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    const handlePointerMove = (e) => {
+      // CRUCIAL PERFORMANCE FIX: Completely ignore processing hover math for touch pointers (phones/tablets) 
+      // otherwise we ruthlessly layout-thrash the DOM on every pixel of a scroll gesture!
+      if (e.pointerType !== 'mouse') return;
+      
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateSpotlight);
+      }
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      if (rafId) cancelAnimationFrame(rafId)
-    }
-  }, [])
+      window.removeEventListener('pointermove', handlePointerMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   // Loading Screen handling
   const handleLoadingComplete = () => {

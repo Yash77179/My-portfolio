@@ -15,7 +15,7 @@ import codeIcon from '../../assets/windows11iconsV1/windows11iconsV1/application
 import desktopIcon from '../../assets/windows11iconsV1/windows11iconsV1/folders/desktop.ico';
 import mailIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/mail.ico';
 import terminalIcon from '../../assets/windows11iconsV1/windows11iconsV1/applications/novelty/terminal.ico';
-import bgVideo from '../../assets/Effect.mp4';
+import bgVideo from '../../assets/Effect.webm';
 
 // Import distinct content components to avoid circular dependencies
 import AboutContent from '../AboutContent';
@@ -130,7 +130,7 @@ const DesktopContent = ({ onShutdown }) => {
                 playsInline
                 preload="auto"
             >
-                <source src={bgVideo} type="video/mp4" />
+                <source src={bgVideo} type="video/webm" />
                 {/* Fallback to static image if video fails in some browsers */}
                 <img src="https://4kwallpapers.com/images/wallpapers/windows-11-dark-mode-blue-stock-official-3840x2160-5630.jpg" alt="Windows 11 Background" className="w-full h-full object-cover" />
             </video>

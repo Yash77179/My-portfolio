@@ -15,19 +15,16 @@ const BackgroundEffects = ({ cursorRef, followerRef }) => {
               radial-gradient(circle at 80% 15%, rgba(236,72,153,0.15), transparent 60%),
               radial-gradient(circle at 70% 70%, rgba(16,185,129,0.12), transparent 55%),
               radial-gradient(circle at 30% 80%, rgba(168,85,247,0.14), transparent 60%)`,
-                        backgroundBlendMode: 'screen',
-                        filter: 'blur(45px)',
                     }}
                 ></div>
                 <div
                     aria-hidden="true"
-                    className="fixed inset-0 -z-10 opacity-40 pointer-events-none grain-layer hidden md:block"
+                    className="fixed inset-0 -z-10 opacity-20 pointer-events-none grain-layer hidden md:block"
                     style={{
                         backgroundImage:
                             'radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15), transparent 40%), radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.1), transparent 35%), radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.12), transparent 40%), radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.12), transparent 35%)',
                         backgroundSize: '80px 80px',
                         animation: 'grain 12s steps(10) infinite',
-                        mixBlendMode: 'screen',
                     }}
                 ></div>
 

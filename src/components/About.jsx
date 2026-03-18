@@ -1,15 +1,26 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ContainerScroll } from './ui/container-scroll-animation';
 import AboutContent from './AboutContent';
 import { Play } from 'lucide-react';
+import yashVideo from '../assets/yash.webm';
 
 const About = () => {
     const navigate = useNavigate();
+    const videoRef = useRef(null);
+
+    // Force-resume background video when tab returns from being backgrounded
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible' && videoRef.current) {
+                videoRef.current.play().catch(() => {});
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibility);
+        return () => document.removeEventListener('visibilitychange', handleVisibility);
+    }, []);
 
     const handleLaunchOS = (e) => {
-        // Stop React from deferring the event
         if (e && e.nativeEvent) {
              e.nativeEvent.stopImmediatePropagation();
         }
@@ -27,61 +38,28 @@ const About = () => {
 
     return (
         <section id="about" className="relative bg-[#050505] text-white pt-32 pb-20 overflow-visible min-h-screen">
-            {/* Background Texture - Subtle Grain */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-
-            {/* Background Decorative Layer - Fixed/Sticky Wrapper (Hidden on Mobile for Performance) */}
-            <div className="hidden md:block absolute inset-0 w-full h-full pointer-events-none">
+            
+            {/* Ambient Background Video Wrapper - Applies to Mobile & Desktop natively */}
+            <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
                 <div 
-                    className="sticky top-0 w-full h-[120vh] overflow-hidden"
-                    style={{
-                        zIndex: 0,
-                    }}
+                    className="sticky top-0 w-full h-screen"
+                    style={{ zIndex: 0 }}
                 >
-                    {/* Gradient Overlay for smooth fade */}
+                    {/* Top & Bottom seamless gradient melts into black background */}
                     <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#050505] to-transparent z-10"></div>
                     <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505] to-transparent z-10"></div>
 
-                    {/* Image 3 (Back) - spins clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow opacity-30" style={{ willChange: 'transform' }}>
-                        <div
-                            className="absolute top-1/2 left-1/2 w-[2000px] h-[2000px] -translate-x-1/2 -translate-y-1/2"
-                        >
-                            <img
-                                src="https://framerusercontent.com/images/oqZEqzDEgSLygmUDuZAYNh2XQ9U.png?scale-down-to=2048"
-                                alt=""
-                                loading="lazy"
-                                className="w-full h-full object-cover" 
-                            />
-                        </div>
-                    </div>
-
-                    {/* Image 2 (Middle) - spins counter-clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow-reverse opacity-40" style={{ willChange: 'transform' }}>
-                        <div
-                            className="absolute top-1/2 left-1/2 w-[1000px] h-[1000px] -translate-x-1/2 -translate-y-1/2"
-                        >
-                            <img
-                                src="https://framerusercontent.com/images/UbucGYsHDAUHfaGZNjwyCzViw8.png?scale-down-to=1024"
-                                alt=""
-                                loading="lazy"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Image 1 (Front) - spins clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow opacity-50" style={{ willChange: 'transform' }}>
-                        <div
-                            className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2"
-                        >
-                            <img
-                                src="https://framerusercontent.com/images/Ans5PAxtJfg3CwxlrPMSshx2Pqc.png"
-                                alt=""
-                                loading="lazy"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                    {/* Animated WebM Video Background */}
+                    <div className="absolute inset-0 opacity-40">
+                        <video
+                            ref={videoRef}
+                            className="w-full h-full object-cover"
+                            src={yashVideo}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                        />
                     </div>
                 </div>
             </div>
@@ -98,21 +76,19 @@ const About = () => {
                     </div>
                 }
             >
-                {/* The actual clickable target covering the whole Card bounds. */}
-                <div 
-                    className="relative w-full h-full group overflow-hidden rounded-2xl"
-                >
+                {/* 3D Rotated Glass Card Shell */}
+                <div className="relative w-full h-full group overflow-hidden rounded-[2rem] md:rounded-2xl">
+                     
                      <div className="w-full h-full pointer-events-none">
                          <AboutContent />
                      </div>
 
-                     {/* Hover overlay - specifically clickable */}
+                     {/* Interactive Hover OS Launcher Overlay */}
                      <div 
                         onClick={handleLaunchOS}
                         className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 z-[9999] cursor-pointer"
                         style={{ pointerEvents: 'auto' }}
                      >
-                        {/* Vignette effect */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
                         
                         <div className="text-center transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col items-center justify-center h-full w-full relative z-10">

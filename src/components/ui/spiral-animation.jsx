@@ -41,11 +41,11 @@ class AnimationController {
     numberOfStars = 5000
     trailLength = 80
     
-    constructor(canvas, ctx, dpr, size) {
+    constructor(canvas, ctx, dpr, dimensions) {
         this.canvas = canvas
         this.ctx = ctx
         this.dpr = dpr
-        this.size = size
+        this.dimensions = dimensions
         this.timeline = gsap.timeline({ repeat: -1 })
         
         // Initialization
@@ -190,10 +190,10 @@ class AnimationController {
         if (!ctx) return
         
         ctx.fillStyle = '#080808'
-        ctx.fillRect(0, 0, this.size, this.size)
+        ctx.fillRect(0, 0, this.dimensions.width, this.dimensions.height)
         
         ctx.save()
-        ctx.translate(this.size / 2, this.size / 2)
+        ctx.translate(this.dimensions.width / 2, this.dimensions.height / 2)
         
         // Time parameters
         const t1 = this.constrain(this.map(this.time, 0, this.changeEventTime + 0.25, 0, 1), 0, 1)
@@ -442,10 +442,9 @@ export function SpiralAnimation({ isExiting }) {
         if (!ctx) return
         
         const dpr = window.devicePixelRatio || 1
-        const size = Math.max(dimensions.width, dimensions.height)
         
-        canvas.width = size * dpr
-        canvas.height = size * dpr
+        canvas.width = dimensions.width * dpr
+        canvas.height = dimensions.height * dpr
         
         canvas.style.width = `${dimensions.width}px`
         canvas.style.height = `${dimensions.height}px`
@@ -457,7 +456,7 @@ export function SpiralAnimation({ isExiting }) {
              animationRef.current.destroy()
         }
 
-        animationRef.current = new AnimationController(canvas, ctx, dpr, size)
+        animationRef.current = new AnimationController(canvas, ctx, dpr, dimensions)
         
         return () => {
              if (animationRef.current) {

@@ -8,7 +8,7 @@ const AboutContent = () => {
             {/* Left: The Visual / Atmospheric Side */}
             <div className="w-full md:w-2/5 relative h-56 md:h-full bg-[#050505] overflow-hidden border-b md:border-b-0 md:border-r border-white/5">
                 {/* Globe/Earth Animation - Primary Visual */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-80 mix-blend-screen pointer-events-none"><Globe /></div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none z-0"><Globe /></div>
                 
                 {/* Gradient Overlay for text readability */}
                 <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />

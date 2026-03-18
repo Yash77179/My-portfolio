@@ -60,7 +60,7 @@ const Services = () => {
                                 className="spotlight-card group relative flex flex-col gap-8 p-8 border border-white/10 rounded-3xl bg-[#050505] transition-all duration-500 hover:-translate-y-1 hover:border-white/20"
                             >
                                 {/* Noise Texture */}
-                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
                                 {/* Step index rail */}
                                 <div className="relative flex items-start justify-between w-full">

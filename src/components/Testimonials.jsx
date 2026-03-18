@@ -5,8 +5,7 @@ import SectionDivider from './SectionDivider';
 const Testimonials = () => {
     return (
         <section id="testimonials" className="relative bg-[#050505] text-white py-24 overflow-hidden min-h-[800px] flex flex-col justify-center">
-             {/* Background Effects */}
-             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
              
              <div className="max-w-7xl mx-auto w-full px-6 md:px-12 relative z-10 flex flex-col items-center">

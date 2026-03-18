@@ -77,19 +77,18 @@ const createClothMaterial = () => {
         vec4 color = texture2D(map, vUv);
         
         if (blurAmount > 0.0) {
-          vec2 texelSize = 1.0 / vec2(textureSize(map, 0));
+          // Extremely fast 5-tap blur for mobile/tablet GPUs 
+          // Avoids textureSize() which causes WebGL1 fallbacks, and avoids nested loops
+          vec2 offset = vec2(blurAmount * 0.02);
           vec4 blurred = vec4(0.0);
-          float total = 0.0;
           
-          for (float x = -2.0; x <= 2.0; x += 1.0) {
-            for (float y = -2.0; y <= 2.0; y += 1.0) {
-              vec2 offset = vec2(x, y) * texelSize * blurAmount;
-              float weight = 1.0 / (1.0 + length(vec2(x, y)));
-              blurred += texture2D(map, vUv + offset) * weight;
-              total += weight;
-            }
-          }
-          color = blurred / total;
+          blurred += texture2D(map, vUv) * 0.382928;
+          blurred += texture2D(map, vUv + vec2(offset.x, offset.y)) * 0.154286;
+          blurred += texture2D(map, vUv + vec2(-offset.x, offset.y)) * 0.154286;
+          blurred += texture2D(map, vUv + vec2(offset.x, -offset.y)) * 0.154286;
+          blurred += texture2D(map, vUv + vec2(-offset.x, -offset.y)) * 0.154286;
+          
+          color = blurred;
         }
         
         float curveHighlight = abs(scrollForce) * 0.05;

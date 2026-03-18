@@ -30,7 +30,7 @@ const Projects = () => {
                                 className="spotlight-card group relative overflow-hidden border border-white/10 rounded-3xl bg-[#050505] transition-all duration-500 hover:-translate-y-1 hover:border-white/20"
                             >
                                 {/* Noise Texture */}
-                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
                                 <div className="relative p-8 md:p-10 space-y-8">
                                     {/* Top row: index + title + stack */}

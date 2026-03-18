@@ -22,7 +22,7 @@ const Experience = () => {
                     {/* Experience Item 01 */}
                     <div className="spotlight-card group relative flex flex-col gap-6 p-8 border border-white/10 rounded-3xl bg-[#050505] transition-all duration-500 hover:-translate-y-1 hover:border-white/20">
                         {/* Noise Texture */}
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                             <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ const Experience = () => {
                     {/* Experience Item 02 */}
                     <div className="spotlight-card group relative flex flex-col gap-6 p-8 border border-white/10 rounded-3xl bg-[#050505] transition-all duration-500 hover:-translate-y-1 hover:border-white/20">
                         {/* Noise Texture */}
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                             <div className="flex items-center gap-4">

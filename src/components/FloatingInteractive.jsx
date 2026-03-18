@@ -58,7 +58,7 @@ const FloatingInteractive = () => {
             >
                 {/* 3D Glossy Reflection overlay */}
                 <div 
-                    className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-black/50 opacity-40 mix-blend-overlay rounded-[2rem] pointer-events-none" 
+                    className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-black/50 opacity-20 rounded-[2rem] pointer-events-none" 
                     style={{ transform: "translateZ(1px)" }} 
                 />
 

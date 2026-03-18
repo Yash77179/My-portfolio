@@ -28,7 +28,7 @@ const About = () => {
     return (
         <section id="about" className="relative bg-[#050505] text-white pt-32 pb-20 overflow-visible min-h-screen">
             {/* Background Texture - Subtle Grain */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+            <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
             {/* Background Decorative Layer - Fixed/Sticky Wrapper (Hidden on Mobile for Performance) */}
             <div className="hidden md:block absolute inset-0 w-full h-full pointer-events-none">
@@ -43,39 +43,42 @@ const About = () => {
                     <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505] to-transparent z-10"></div>
 
                     {/* Image 3 (Back) - spins clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow opacity-30">
+                    <div className="absolute inset-0 animate-spin-slow opacity-30" style={{ willChange: 'transform' }}>
                         <div
                             className="absolute top-1/2 left-1/2 w-[2000px] h-[2000px] -translate-x-1/2 -translate-y-1/2"
                         >
                             <img
                                 src="https://framerusercontent.com/images/oqZEqzDEgSLygmUDuZAYNh2XQ9U.png?scale-down-to=2048"
                                 alt=""
+                                loading="lazy"
                                 className="w-full h-full object-cover" 
                             />
                         </div>
                     </div>
 
                     {/* Image 2 (Middle) - spins counter-clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow-reverse opacity-40">
+                    <div className="absolute inset-0 animate-spin-slow-reverse opacity-40" style={{ willChange: 'transform' }}>
                         <div
                             className="absolute top-1/2 left-1/2 w-[1000px] h-[1000px] -translate-x-1/2 -translate-y-1/2"
                         >
                             <img
                                 src="https://framerusercontent.com/images/UbucGYsHDAUHfaGZNjwyCzViw8.png?scale-down-to=1024"
                                 alt=""
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                             />
                         </div>
                     </div>
 
                     {/* Image 1 (Front) - spins clockwise */}
-                    <div className="absolute inset-0 animate-spin-slow opacity-50">
+                    <div className="absolute inset-0 animate-spin-slow opacity-50" style={{ willChange: 'transform' }}>
                         <div
                             className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2"
                         >
                             <img
                                 src="https://framerusercontent.com/images/Ans5PAxtJfg3CwxlrPMSshx2Pqc.png"
                                 alt=""
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                             />
                         </div>
@@ -106,7 +109,7 @@ const About = () => {
                      {/* Hover overlay - specifically clickable */}
                      <div 
                         onClick={handleLaunchOS}
-                        className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-md z-[9999] cursor-pointer"
+                        className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 z-[9999] cursor-pointer"
                         style={{ pointerEvents: 'auto' }}
                      >
                         {/* Vignette effect */}

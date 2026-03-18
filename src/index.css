@@ -115,8 +115,6 @@ html {
 
 section {
   scroll-margin-top: 2.5rem;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 100vh;
 }
 
 @media (min-width: 768px) {

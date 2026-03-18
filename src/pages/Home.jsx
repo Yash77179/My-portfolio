@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+gsap.registerPlugin(ScrollTrigger)
 import '../App.css' // Adjusted import path
 
 // Components - Adjusted import paths
@@ -8,17 +11,16 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import BackgroundEffects from '../components/BackgroundEffects'
 import CustomCursor from '../components/CustomCursor'
-import React, { Suspense } from 'react'
-
-const About = React.lazy(() => import('../components/About'))
-const ShadwayGallery = React.lazy(() => import('../components/ShadwayGallery'))
-const FeaturedWork = React.lazy(() => import('../components/FeaturedWork'))
-const Services = React.lazy(() => import('../components/Services'))
-const Projects = React.lazy(() => import('../components/Projects'))
-const Experience = React.lazy(() => import('../components/Experience'))
-const Testimonials = React.lazy(() => import('../components/Testimonials'))
-const Contact = React.lazy(() => import('../components/Contact'))
-const Footer = React.lazy(() => import('../components/Footer'))
+import React from 'react'
+import About from '../components/About'
+import ShadwayGallery from '../components/ShadwayGallery'
+import FeaturedWork from '../components/FeaturedWork'
+import Services from '../components/Services'
+import Projects from '../components/Projects'
+import Experience from '../components/Experience'
+import Testimonials from '../components/Testimonials'
+import Contact from '../components/Contact'
+import Footer from '../components/Footer'
 
 
 // Lenis
@@ -32,7 +34,6 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true)
 
   const [isPhysicsReady, setIsPhysicsReady] = useState(false)
-
   // Initialize Lenis Smooth Scroll
   useEffect(() => {
     const lenis = new Lenis({
@@ -46,15 +47,18 @@ function Home() {
       touchMultiplier: 2,
     })
 
-    function raf(time) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
+    lenis.on('scroll', ScrollTrigger.update)
 
-    requestAnimationFrame(raf)
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000)
+    })
+    
+    gsap.ticker.lagSmoothing(0)
 
     return () => {
       lenis.destroy()
+      lenis.off('scroll', ScrollTrigger.update)
+      gsap.ticker.remove((time) => lenis.raf(time * 1000))
     }
   }, [])
 
@@ -93,22 +97,35 @@ function Home() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Spotlight Effect Logic
+  // Spotlight Effect Logic — throttled with RAF to avoid forced layout thrashing
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    let rafId = null
+    let lastX = 0, lastY = 0
+
+    const updateSpotlight = () => {
       if (window.innerWidth < 1024) return
       const cards = document.querySelectorAll('.spotlight-card')
       cards.forEach(card => {
         const rect = card.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
-        card.style.setProperty('--mouse-x', `${x}px`)
-        card.style.setProperty('--mouse-y', `${y}px`)
+        card.style.setProperty('--mouse-x', `${lastX - rect.left}px`)
+        card.style.setProperty('--mouse-y', `${lastY - rect.top}px`)
       })
+      rafId = null
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    const handleMouseMove = (e) => {
+      lastX = e.clientX
+      lastY = e.clientY
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateSpotlight)
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   // Loading Screen handling
@@ -118,13 +135,25 @@ function Home() {
      setTimeout(() => setIsPhysicsReady(true), 800);
   }
 
+  const staticContent = React.useMemo(() => (
+    <>
+      <About />
+      <ShadwayGallery />
+      <Services />
+      <Projects />
+      <Experience />
+      <FeaturedWork />
+      <Testimonials />
+    </>
+  ), []);
+
   return (
     <LazyMotion features={domAnimation}>
       <div className="bg-black text-white relative">
         <AnimatePresence mode="wait">
-          {isLoading && (
-            <LoadingScreen key="loading" onComplete={handleLoadingComplete} />
-          )}
+           {isLoading && (
+              <LoadingScreen key="loading" onComplete={handleLoadingComplete} />
+           )}
         </AnimatePresence>
 
         <m.div 
@@ -139,42 +168,18 @@ function Home() {
             <BackgroundEffects />
             <CustomCursor />
 
-              <Navbar
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                activeSection={activeSection}
-                isDesktop={isDesktop}
-              />
+            <Navbar
+                 mobileMenuOpen={mobileMenuOpen}
+                 setMobileMenuOpen={setMobileMenuOpen}
+                 activeSection={activeSection}
+                 isDesktop={isDesktop}
+            />
 
             <main>
               <Hero isDesktop={isDesktop} isLoading={!isPhysicsReady} />
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <About />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <ShadwayGallery />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Services />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Projects />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Experience />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <FeaturedWork />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Testimonials />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Contact activeSection={activeSection} isDesktop={isDesktop} />
-              </Suspense>
-              <Suspense fallback={<div className="min-h-screen"></div>}>
-                <Footer />
-              </Suspense>
+              {staticContent}
+              <Contact activeSection={activeSection} isDesktop={isDesktop} />
+              <Footer />
             </main>
           </m.div>
       </div>

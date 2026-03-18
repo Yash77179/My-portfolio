@@ -13,7 +13,7 @@ const FeaturedWork = () => {
         <section ref={containerRef} id="featured-work" className="relative w-full h-[400vh] bg-[#050505]">
             <div className="sticky top-0 h-screen w-full overflow-hidden">
                 {/* Background Texture - Subtle Grain */}
-                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay z-10"></div>
+                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-10"></div>
                 
                 <IntroAnimation scrollYProgress={scrollYProgress} />
             </div>

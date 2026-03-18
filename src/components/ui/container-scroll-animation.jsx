@@ -12,12 +12,6 @@ export const ContainerScroll = ({
     offset: ["start end", "end end"]
   });
   
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 80, 
-    damping: 20,    
-    restDelta: 0.001
-  });
-
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -43,9 +37,10 @@ export const ContainerScroll = ({
     return isMobile ? [0.9, 1] : [0.85, 1];
   };
 
-  const rotate = useTransform(smoothProgress, [0, 1], [40, 0]);
-  const scale = useTransform(smoothProgress, [0, 1], scaleDimensions());
-  const translate = useTransform(smoothProgress, [0, 1], [0, -100]);
+  // Lenis already smooths scroll perfectly. useSpring on top creates math conflict and rubber-banding stutter.
+  const rotate = useTransform(scrollYProgress, [0, 1], [40, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());
+  const translate = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
     <div
@@ -72,6 +67,7 @@ export const Header = ({ translate, titleComponent }) => {
     <motion.div
       style={{
         translateY: translate,
+        willChange: "transform"
       }}
       className="div max-w-5xl mx-auto text-center relative z-0 pointer-events-none"
     >
@@ -93,7 +89,8 @@ export const Card = ({
         translateY: translate,
         scale,
         boxShadow:
-          "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003",
+          "0 20px 40px rgba(0,0,0,0.6), 0 50px 100px rgba(0,0,0,0.4)",
+        willChange: "transform"
       }}
       className="max-w-[22rem] sm:max-w-[30rem] md:max-w-[70rem] -mt-12 mx-auto h-[42rem] sm:h-[45rem] md:h-[55rem] w-full border-[6px] md:border-4 border-[#333333] p-1.5 md:p-6 bg-[#111111] rounded-[2.5rem] md:rounded-[30px] shadow-[0_0_50px_rgba(0,0,0,0.6)] relative z-50 pointer-events-auto"
     >

@@ -29,7 +29,7 @@ export default function ShadwayGallery() {
             end: "+=4000", // Increased duration for smoother/longer scroll
             pin: true,
             scrub: 1, // Smooth scrubbing
-            anticipatePin: 1, // Avoid jumpiness
+            pinType: "fixed", // Force fixed coordinate pinning natively for Lenis compatibility
             onUpdate: (self) => {
                 // Directly update the ref without causing a re-render
                 scrollProgress.current = self.progress;

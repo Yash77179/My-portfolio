@@ -24,7 +24,7 @@ export function Marquee({
             pauseOnHover && "hover:[animation-play-state:paused]",
             direction === "right" && "animate-marquee-reverse"
           )}
-          style={{ "--duration": `${speed}s` }}
+          style={{ "--duration": `${speed}s`, willChange: "transform" }}
         >
           {children}
           {children}

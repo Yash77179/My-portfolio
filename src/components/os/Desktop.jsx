@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WindowManagerProvider, useWindowManager } from './WindowManager';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
@@ -32,6 +32,25 @@ const AppWrapper = ({ children }) => (
 
 const DesktopContent = ({ onShutdown }) => {
     const { windows, openWindow, startMenuOpen, searchOpen, calendarOpen, restoredWindowIds } = useWindowManager();
+    const videoRef = useRef(null);
+
+    // Force-resume video when tab becomes visible again to prevent freeze/vanish
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && videoRef.current) {
+                // Force the video to resume playing immediately
+                const vid = videoRef.current;
+                vid.play().catch(() => {});
+                // Force a repaint by briefly toggling a style
+                vid.style.opacity = '0.99';
+                requestAnimationFrame(() => {
+                    vid.style.opacity = '1';
+                });
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
 
     const desktopIcons = [
         { 
@@ -103,11 +122,13 @@ const DesktopContent = ({ onShutdown }) => {
         <div className="fixed inset-0 h-screen w-screen overflow-hidden select-none animate-in fade-in zoom-in-95 duration-1000">
             {/* Animated Video Background */}
             <video 
+                ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
                 autoPlay 
                 loop 
                 muted 
                 playsInline
+                preload="auto"
             >
                 <source src={bgVideo} type="video/mp4" />
                 {/* Fallback to static image if video fails in some browsers */}

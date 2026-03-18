@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Square, X, Copy } from 'lucide-react';
 import { useWindowManager } from './WindowManager';
 import { Rnd } from 'react-rnd';
+import useWindowStore from './useWindowStore'; // ADDED: Zustand store
 
 export const Window = ({ children, id, title, icon }) => {
   const { closeWindow, activeWindowId, bringToFront, toggleMinimize, toggleMaximize, windows, startMenuOpen, setStartMenuOpen } = useWindowManager();
@@ -11,16 +12,40 @@ export const Window = ({ children, id, title, icon }) => {
   const isMaximized = windowState?.maximized;
   const isMinimized = windowState?.minimized;
 
-  // Default position roughly centered
-  const [rndState, setRndState] = useState({
+  // MODIFIED: Use Zustand store as source of truth for geometry (with localStorage persistence)
+  const storeGeometries = useWindowStore(state => state.windowGeometries);
+  const setStoreGeometry = useWindowStore(state => state.setWindowGeometry);
+  const storePreMaxStates = useWindowStore(state => state.windowPreMaxStates);
+  const setStorePreMax = useWindowStore(state => state.setPreMaxState);
+  const storeZIndices = useWindowStore(state => state.zIndices);
+
+  // Compute geometry from store or use defaults
+  const defaultGeo = {
       width: 800,
       height: 500,
       x: typeof window !== 'undefined' ? window.innerWidth / 2 - 400 : 80,
       y: typeof window !== 'undefined' ? window.innerHeight / 2 - 250 : 80
-  });
+  };
 
-  // Track if we just maximized to save previous state
-  const [preMaxState, setPreMaxState] = useState(null);
+  // Local rndState initialized from Zustand (persisted) store
+  const [rndState, _setRndState] = useState(() => storeGeometries[id] || defaultGeo);
+  
+  // ADDED: Wrapper that syncs local state + Zustand store together
+  const setRndState = useCallback((valueOrFn) => {
+      _setRndState(prev => {
+          const next = typeof valueOrFn === 'function' ? valueOrFn(prev) : valueOrFn;
+          // Sync to Zustand (persisted)
+          setStoreGeometry(id, next);
+          return next;
+      });
+  }, [id, setStoreGeometry]);
+
+  // MODIFIED: preMaxState backed by Zustand
+  const preMaxState = storePreMaxStates[id] || null;
+  const setPreMaxState = useCallback((val) => {
+      setStorePreMax(id, val);
+  }, [id, setStorePreMax]);
+
   const [showSnapMenu, setShowSnapMenu] = useState(false);
   const [snapPreview, setSnapPreview] = useState(null);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -285,7 +310,7 @@ export const Window = ({ children, id, title, icon }) => {
         maxWidth="100vw"
         maxHeight="100vh"
         style={{ 
-            zIndex: isActive ? 50 : 10,
+            zIndex: storeZIndices[id] || (isActive ? 50 : 10), // MODIFIED: Use Zustand z-index
             pointerEvents: isMinimized ? 'none' : 'auto'
         }}
         onMouseDown={() => bringToFront(id)}

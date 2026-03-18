@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import useWindowStore from './useWindowStore'; // ADDED: Zustand store
 
 const WindowManagerContext = createContext();
 
@@ -11,8 +12,10 @@ export const WindowManagerProvider = ({ children, onShutdown, onRestart, onLock 
   const [searchOpen, setSearchOpen] = useState(false); // Added searchOpen state
   const [calendarOpen, setCalendarOpen] = useState(false);
   
-  // Z-index management
-  const [zIndices, setZIndices] = useState({});
+  // MODIFIED: Z-index management via Zustand store
+  const zIndices = useWindowStore(state => state.zIndices);
+  const bringToFrontZ = useWindowStore(state => state.bringToFrontZ);
+  const removeWindowGeometry = useWindowStore(state => state.removeWindowGeometry);
 
   // Get initial restored window IDs once on mount
   const [restoredWindowIds] = useState(() => {
@@ -53,8 +56,8 @@ export const WindowManagerProvider = ({ children, onShutdown, onRestart, onLock 
   };
 
   const bringToFront = (appId) => {
-      const maxZ = Math.max(0, ...Object.values(zIndices));
-      setZIndices(prev => ({ ...prev, [appId]: maxZ + 1 }));
+      // MODIFIED: Use Zustand for z-index management
+      bringToFrontZ(appId);
       setActiveWindowId(appId);
       // Ensure it's not minimized
       setWindows(prev => prev.map(w => w.id === appId ? { ...w, minimized: false } : w));
@@ -80,6 +83,8 @@ export const WindowManagerProvider = ({ children, onShutdown, onRestart, onLock 
 
   const closeWindow = (appId) => {
     setWindows(prev => prev.filter((w) => w.id !== appId));
+    // ADDED: Clean up Zustand geometry for closed window
+    removeWindowGeometry(appId);
     if (activeWindowId === appId) {
       setActiveWindowId(null);
     }

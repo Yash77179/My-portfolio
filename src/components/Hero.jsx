@@ -1,12 +1,14 @@
 import React, { useRef } from 'react';
+import { useInView } from 'framer-motion';
 import Silk from './Silk';
 import Lanyard from './Lanyard';
 
-const Hero = React.memo(({ isDesktop }) => {
-    const photoRef = useRef(null);
+const Hero = React.memo(({ isDesktop, isLoading }) => {
+    const heroRef = useRef(null);
+    const isInView = useInView(heroRef, { margin: "0px 0px 200px 0px" });
 
     return (
-        <section id="home" className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
+        <section id="home" ref={heroRef} className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 w-full h-full z-0" style={{ width: '100vw', height: '100vh', background: '#000000' }}>
                 <div className="w-full h-full opacity-60"> {/* Reduced opacity for subtleties */}
                     <Silk
@@ -14,6 +16,7 @@ const Hero = React.memo(({ isDesktop }) => {
                         scale={1.2} // Zoomed in a little (decreased scale = larger waves)
                         speed={1.2}
                         noiseIntensity={1.0}
+                        inView={isInView}
                     />
                 </div>
             </div>
@@ -25,14 +28,14 @@ const Hero = React.memo(({ isDesktop }) => {
             <div className="absolute inset-0 z-70 w-full h-full pointer-events-none flex items-center justify-center overflow-visible">
                 {/* CSS scale can artificially enlarge it without breaking internal ThreeJS math */}
                 <div className="w-full h-full pointer-events-auto transform translate-x-[15vw] -translate-y-[2vh] lg:translate-x-[22vw] lg:-translate-y-[4vh] xl:-translate-y-[6vh]">
-                    <Lanyard position={[0, 0, 30]} gravity={[0, -40, 0]} fov={11.5} transparent={true} />
+                    <Lanyard position={[0, 0, 30]} gravity={[0, -40, 0]} fov={11.5} transparent={true} inView={isInView} isLoading={isLoading} />
                 </div>
             </div>
 
             {/* Hero Content Overlay */}
             <div className="relative z-50 px-4 md:px-6 py-8 md:py-12 w-full h-full flex flex-col justify-between pointer-events-none">
                 {/* Left Side Editorial Aesthetic */}
-                <div className="hidden lg:flex absolute top-[30%] xl:top-[35%] left-10 xl:left-20 flex-col mix-blend-difference pointer-events-none z-20">
+                <div className="hidden lg:flex absolute top-[30%] xl:top-[35%] left-10 xl:left-20 flex-col pointer-events-none z-20 drop-shadow-lg">
                     {/* Minimalist Identity Badge */}
                     <div className="flex items-center gap-4 mb-8">
                         <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center relative">

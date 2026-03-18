@@ -9,37 +9,51 @@ const Footer = () => {
     const nameRef = useRef(null);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
-            // Initial staggered reveal of all footer text elements
-            gsap.from(".footer-item", {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                stagger: 0.05,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: footerRef.current,
-                    start: "top 80%",
-                }
-            });
-
-            // Parallax effect for the giant name background
-            gsap.fromTo(nameRef.current, 
-                { y: "20%" },
-                {
-                    y: "-20%",
-                    ease: "none",
+        // Defer heavy GSAP ScrollTrigger measurements until the browser is idle
+        const initGSAP = () => {
+            let ctx = gsap.context(() => {
+                // Initial staggered reveal of all footer text elements
+                gsap.from(".footer-item", {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.05,
+                    ease: "power3.out",
                     scrollTrigger: {
                         trigger: footerRef.current,
-                        start: "top bottom",
-                        end: "bottom top",
-                        scrub: 1
+                        start: "top 80%",
                     }
-                }
-            );
-        }, footerRef);
+                });
 
-        return () => ctx.revert();
+                // Parallax effect for the giant name background
+                gsap.fromTo(nameRef.current, 
+                    { y: "20%" },
+                    {
+                        y: "-20%",
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: footerRef.current,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1
+                        }
+                    }
+                );
+            }, footerRef);
+
+            return ctx;
+        };
+
+        let ctx;
+        const id = typeof requestIdleCallback !== 'undefined' 
+            ? requestIdleCallback(() => { ctx = initGSAP(); })
+            : setTimeout(() => { ctx = initGSAP(); }, 100);
+
+        return () => {
+            if (ctx) ctx.revert();
+            if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(id);
+            else clearTimeout(id);
+        };
     }, []);
 
     return (

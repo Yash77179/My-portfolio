@@ -1,4 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=general-sans@200,300,400,500,600,700&display=swap');
+
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/preflight" layer(base);
 @import "tailwindcss/utilities" layer(utilities);
@@ -115,6 +115,8 @@ html {
 
 section {
   scroll-margin-top: 2.5rem;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100vh;
 }
 
 @media (min-width: 768px) {

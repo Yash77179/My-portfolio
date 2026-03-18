@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import '../App.css' // Adjusted import path
 
 // Components - Adjusted import paths
 import LoadingScreen from '../components/LoadingScreen'
 import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
-import About from '../components/About'
-import ShadwayGallery from '../components/ShadwayGallery'
-import FeaturedWork from '../components/FeaturedWork'
-import Services from '../components/Services'
-import Projects from '../components/Projects'
-import Experience from '../components/Experience'
-import Testimonials from '../components/Testimonials'
-import Contact from '../components/Contact'
-import Footer from '../components/Footer'
 import BackgroundEffects from '../components/BackgroundEffects'
 import CustomCursor from '../components/CustomCursor'
+import React, { Suspense } from 'react'
+
+const About = React.lazy(() => import('../components/About'))
+const ShadwayGallery = React.lazy(() => import('../components/ShadwayGallery'))
+const FeaturedWork = React.lazy(() => import('../components/FeaturedWork'))
+const Services = React.lazy(() => import('../components/Services'))
+const Projects = React.lazy(() => import('../components/Projects'))
+const Experience = React.lazy(() => import('../components/Experience'))
+const Testimonials = React.lazy(() => import('../components/Testimonials'))
+const Contact = React.lazy(() => import('../components/Contact'))
+const Footer = React.lazy(() => import('../components/Footer'))
+
 
 // Lenis
 import Lenis from 'lenis'
@@ -27,6 +30,8 @@ function Home() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true)
   const [activeSection, setActiveSection] = useState('home')
   const [isLoading, setIsLoading] = useState(true)
+
+  const [isPhysicsReady, setIsPhysicsReady] = useState(false)
 
   // Initialize Lenis Smooth Scroll
   useEffect(() => {
@@ -109,22 +114,27 @@ function Home() {
   // Loading Screen handling
   const handleLoadingComplete = () => {
      setIsLoading(false);
+     // Delay the physics unpause until the loading screen doors physically slide open (about 0.8s into the 1.4s exit animation).
+     setTimeout(() => setIsPhysicsReady(true), 800);
   }
 
   return (
-    <div className="bg-black text-white relative">
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <LoadingScreen key="loading" onComplete={handleLoadingComplete} />
-        )}
-      </AnimatePresence>
+    <LazyMotion features={domAnimation}>
+      <div className="bg-black text-white relative">
+        <AnimatePresence mode="wait">
+          {isLoading && (
+            <LoadingScreen key="loading" onComplete={handleLoadingComplete} />
+          )}
+        </AnimatePresence>
 
-      {!isLoading && (
-        <motion.div 
+        <m.div 
             key="main-app"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isLoading ? 0 : 1 }}
             transition={{ duration: 0.5 }}
+            style={{ 
+               pointerEvents: isLoading ? 'none' : 'auto'
+            }}
         >
             <BackgroundEffects />
             <CustomCursor />
@@ -136,22 +146,39 @@ function Home() {
                 isDesktop={isDesktop}
               />
 
-              <main>
-                <Hero isDesktop={isDesktop} />
+            <main>
+              <Hero isDesktop={isDesktop} isLoading={!isPhysicsReady} />
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <About />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <ShadwayGallery />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <Services />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <Projects />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <Experience />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <FeaturedWork />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <Testimonials />
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
                 <Contact activeSection={activeSection} isDesktop={isDesktop} />
-              </main>
-
-              <Footer />
-          </motion.div>
-      )}
-    </div>
+              </Suspense>
+              <Suspense fallback={<div className="min-h-screen"></div>}>
+                <Footer />
+              </Suspense>
+            </main>
+          </m.div>
+      </div>
+    </LazyMotion>
   )
 }
 

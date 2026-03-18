@@ -74,7 +74,7 @@ class AnimationController {
     createStars() {
         this.stars = []
         for (let i = 0; i < this.numberOfStars; i++) {
-            this.stars.push(new Star(this.cameraZ, this.cameraTravelDistance))
+            this.stars.push(new Star(this.cameraZ, this.cameraTravelDistance, this))
         }
     }
     
@@ -169,11 +169,9 @@ class AnimationController {
             const x = this.viewZoom * position.x / dotDepthFromCamera
             const y = this.viewZoom * position.y / dotDepthFromCamera
             const sw = 400 * sizeFactor / dotDepthFromCamera
-            
-            this.ctx.lineWidth = sw
-            this.ctx.beginPath()
-            this.ctx.arc(x, y, 0.5, 0, Math.PI * 2)
-            this.ctx.fill()
+            const r = 0.5 // Preserving the original fixed tiny dot size
+            this.ctx.moveTo(x + r, y)
+            this.ctx.arc(x, y, r, 0, Math.PI * 2)
         }
     }
     
@@ -209,24 +207,27 @@ class AnimationController {
         
         // Draw Stars
         ctx.fillStyle = 'white'
+        ctx.beginPath()
         for (const star of this.stars) {
             star.render(t1, this)
         }
+        ctx.fill()
         
         // Draw Start Dot
+        ctx.beginPath()
         this.drawStartDot()
+        ctx.fill()
         
         ctx.restore()
     }
     
     // Draw Trail
     drawTrail(t1) {
+        this.ctx.fillStyle = 'white'
+        this.ctx.beginPath()
         for (let i = 0; i < this.trailLength; i++) {
             const f = this.map(i, 0, this.trailLength, 1.1, 0.1)
             const sw = (1.3 * (1 - t1) + 3.0 * Math.sin(Math.PI * t1)) * f
-            
-            this.ctx.fillStyle = 'white'
-            this.ctx.lineWidth = sw
             
             const pathTime = t1 - 0.00015 * i
             const position = this.spiralPath(pathTime)
@@ -241,10 +242,11 @@ class AnimationController {
                 i % 2 === 0
             )
             
-            this.ctx.beginPath()
-            this.ctx.arc(rotated.x, rotated.y, sw / 2, 0, Math.PI * 2)
-            this.ctx.fill()
+            const r = sw / 2
+            this.ctx.moveTo(rotated.x + r, rotated.y)
+            this.ctx.arc(rotated.x, rotated.y, r, 0, Math.PI * 2)
         }
+        this.ctx.fill()
     }
     
     // Controls
@@ -294,8 +296,9 @@ class Star {
     dx
     dy
     spiralLocation
+    spiralPos
     
-    constructor(cameraZ, cameraTravelDistance) {
+    constructor(cameraZ, cameraTravelDistance, controller) {
         this.angle = Math.random() * Math.PI * 2
         this.distance = 30 * Math.random() + 15
         this.rotationDirection = Math.random() > 0.5 ? 1 : -1
@@ -306,6 +309,9 @@ class Star {
         this.dy = this.distance * Math.sin(this.angle)
         
         this.spiralLocation = (1 - Math.pow(1 - Math.random(), 3.0)) / 1.3
+        // Cache the spiral calculations directly so we don't calculate on 5000 stars every frame
+        this.spiralPos = controller.spiralPath(this.spiralLocation)
+        
         this.z = Vector2D.random(0.5 * cameraZ, cameraTravelDistance + cameraZ)
         
         const lerp = (start, end, t) => start * (1 - t) + end * t
@@ -314,7 +320,7 @@ class Star {
     }
     
     render(p, controller) {
-        const spiralPos = controller.spiralPath(this.spiralLocation)
+        const spiralPos = this.spiralPos
         const q = p - this.spiralLocation
         
         if (q > 0) {
@@ -404,16 +410,28 @@ export function SpiralAnimation({ isExiting }) {
     const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight })
     
     useEffect(() => {
+        let timeoutId;
         const handleResize = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight
-            })
-        }
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                setDimensions({
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                });
+            }, 150);
+        };
         
-        handleResize()
+        // Initial setup
+        setDimensions({
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        
         window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', handleResize)
+        }
     }, [])
     
     useEffect(() => {

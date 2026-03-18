@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Spline from '@splinetool/react-spline';
 
 const Contact = ({ activeSection, isDesktop }) => {
     const [activeContactTab, setActiveContactTab] = useState('email')
@@ -28,11 +27,7 @@ const Contact = ({ activeSection, isDesktop }) => {
 
     return (
         <section id="contact" className="relative w-screen min-h-screen bg-black overflow-hidden border-white/10 flex items-center">
-            {activeSection === 'contact' && isDesktop && (
-                <div className="absolute inset-0">
-                    <Spline scene="https://prod.spline.design/NCzgzlnfe2ylzLAZ/scene.splinecode" />
-                </div>
-            )}
+
 
             {/* Mobile Ambient Visuals (When Spline is hidden) */}
             <div className="absolute inset-0 lg:hidden pointer-events-none overflow-hidden">

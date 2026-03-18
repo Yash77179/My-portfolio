@@ -7,16 +7,30 @@ const ScrollLogo = () => {
     const [windowDimensions, setWindowDimensions] = useState({ height: 800, width: 1200 });
 
     useEffect(() => {
+        let timeoutId;
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
-            setWindowDimensions({
-                height: window.innerHeight,
-                width: window.innerWidth
-            });
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                setIsMobile(window.innerWidth < 768);
+                setWindowDimensions({
+                    height: window.innerHeight,
+                    width: window.innerWidth
+                });
+            }, 100);
         };
-        handleResize();
+        
+        // Initial setup
+        setIsMobile(window.innerWidth < 768);
+        setWindowDimensions({
+            height: window.innerHeight,
+            width: window.innerWidth
+        });
+        
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     const maxScroll = isMobile ? 300 : 500;

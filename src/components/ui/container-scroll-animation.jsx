@@ -21,12 +21,20 @@ export const ContainerScroll = ({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    let timeoutId;
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth <= 768);
+      }, 100);
     };
-    checkMobile();
+    
+    // Initial setup
+    setIsMobile(window.innerWidth <= 768);
+    
     window.addEventListener("resize", checkMobile);
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener("resize", checkMobile);
     };
   }, []);

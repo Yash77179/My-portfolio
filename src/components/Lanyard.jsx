@@ -12,12 +12,12 @@ import cardGLB from '../assets/lanyard/card.glb';
 import lanyard from '../assets/lanyard/lanyard.png';
 import yashPhoto from '../assets/yash.png';
 
-import * as THREE from 'three';
+import { Color, Vector3, ClampToEdgeWrapping, CatmullRomCurve3, RepeatWrapping } from 'three';
 import './Lanyard.css';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
-export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true }) {
+export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true, inView = true, isLoading = false }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
   useEffect(() => {
@@ -30,12 +30,12 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
     <div className="lanyard-wrapper">
       <Canvas
         camera={{ position: position, fov: fov }}
-        dpr={[1, isMobile ? 1.5 : 2]}
+        dpr={[1, isMobile ? 1 : 1.5]}
         gl={{ alpha: transparent }}
-        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+        onCreated={({ gl }) => gl.setClearColor(new Color(0x000000), transparent ? 0 : 1)}
       >
         <ambientLight intensity={Math.PI} />
-        <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
+        <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60} paused={isLoading}>
           <Band isMobile={isMobile} />
         </Physics>
         <Environment blur={0.75}>
@@ -80,10 +80,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     j2 = useRef(),
     j3 = useRef(),
     card = useRef();
-  const vec = new THREE.Vector3(),
-    ang = new THREE.Vector3(),
-    rot = new THREE.Vector3(),
-    dir = new THREE.Vector3();
+  const vec = new Vector3(),
+    ang = new Vector3(),
+    rot = new Vector3(),
+    dir = new Vector3();
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
   const { nodes, materials } = useGLTF(cardGLB);
   const texture = useTexture(lanyard);
@@ -99,15 +99,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       // And we center that 60% with offset.x = 0.2
       cardFaceTexture.repeat.set(1.2, 1.2); 
       cardFaceTexture.offset.set(0.2, -0.1);
-      cardFaceTexture.wrapS = THREE.ClampToEdgeWrapping;
-      cardFaceTexture.wrapT = THREE.ClampToEdgeWrapping;
+      cardFaceTexture.wrapS = ClampToEdgeWrapping;
+      cardFaceTexture.wrapT = ClampToEdgeWrapping;
       cardFaceTexture.needsUpdate = true;
     }
   }, [cardFaceTexture]);
 
   const [curve] = useState(
     () =>
-      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+      new CatmullRomCurve3([new Vector3(), new Vector3(), new Vector3(), new Vector3()])
   );
   const [dragged, drag] = useState(false);
   const [hovered, hover] = useState(false);
@@ -159,11 +159,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       const safeDelta = Math.min(delta, 0.1);
 
       [j1, j2].forEach(ref => {
-        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
+        if (!ref.current.lerped) ref.current.lerped = new Vector3().copy(ref.current.translation());
         
         // Prevent strictly `.copy()` from crashing if translation is an object Instead of Vector3
         const trans = ref.current.translation();
-        const currentPos = new THREE.Vector3(trans.x, trans.y, trans.z);
+        const currentPos = new Vector3(trans.x, trans.y, trans.z);
         const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(currentPos)));
         
         ref.current.lerped.lerp(
@@ -173,13 +173,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       });
 
       const t3 = j3.current.translation();
-      curve.points[0].copy(new THREE.Vector3(t3.x, t3.y, t3.z));
+      curve.points[0].copy(new Vector3(t3.x, t3.y, t3.z));
       
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       
       const tf = fixed.current.translation();
-      curve.points[3].copy(new THREE.Vector3(tf.x, tf.y, tf.z));
+      curve.points[3].copy(new Vector3(tf.x, tf.y, tf.z));
       
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
       
@@ -195,7 +195,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   });
 
   curve.curveType = 'chordal';
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.wrapS = texture.wrapT = RepeatWrapping;
 
   return (
     <>
@@ -226,7 +226,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
               if (isMobile) return;
               try { e.target.setPointerCapture(e.pointerId); } catch(err) {}
               const t = card.current.translation();
-              drag(new THREE.Vector3().copy(e.point).sub(new THREE.Vector3(t.x, t.y, t.z)));
+              drag(new Vector3().copy(e.point).sub(new Vector3(t.x, t.y, t.z)));
             }}
           >
             <mesh geometry={nodes.card.geometry}>

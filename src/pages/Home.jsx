@@ -3,6 +3,7 @@ import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
+ScrollTrigger.config({ limitCallbacks: true })
 import '../App.css' // Adjusted import path
 
 // Components - Adjusted import paths
@@ -14,6 +15,7 @@ import CustomCursor from '../components/CustomCursor'
 import React from 'react'
 import About from '../components/About'
 import ShadwayGallery from '../components/ShadwayGallery'
+import HorizontalOffers from '../components/HorizontalOffers'
 import FeaturedWork from '../components/FeaturedWork'
 import Services from '../components/Services'
 import Projects from '../components/Projects'
@@ -175,6 +177,7 @@ function Home() {
     <>
       <About />
       <ShadwayGallery />
+      <HorizontalOffers />
       <Services />
       <Projects />
       <Experience />

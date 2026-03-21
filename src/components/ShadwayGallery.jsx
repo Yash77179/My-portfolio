@@ -1,5 +1,5 @@
 // src/components/ShadwayGallery.jsx
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -10,6 +10,19 @@ gsap.registerPlugin(ScrollTrigger);
 export default function ShadwayGallery() {
     const containerRef = useRef(null);
     const scrollProgress = useRef(0);
+    const [isNearViewport, setIsNearViewport] = useState(false);
+
+    // Track whether the gallery is near the viewport to pause/resume the 3D Canvas
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => setIsNearViewport(entry.isIntersecting),
+            { rootMargin: '400px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     const sampleImages = [
         { src: 'https://images.unsplash.com/photo-1741332966416-414d8a5b8887?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw2fHx8ZW58MHx8fHx8', alt: 'Image 1' },
@@ -50,6 +63,7 @@ export default function ShadwayGallery() {
                 visibleCount={8}
                 scrollProgress={scrollProgress}
                 className="w-full h-full"
+                inView={isNearViewport}
             />
         </section>
     );

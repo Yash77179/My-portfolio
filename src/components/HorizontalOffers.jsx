@@ -63,15 +63,33 @@ export default function HorizontalOffers() {
             { scale: 1, opacity: 1, duration: 0.25, ease: 'power2.out' },
         );
 
-        // Phase 2: Track slides left — force3d isolates it on the GPU compositor
+        // Phase 2: Track slides left
         tl.to(track, {
             x: -totalScroll,
             duration: 1,
             ease: 'none',
-            force3d: true,
         });
 
-        return () => tl.kill();
+        // Velocity-based skew for physical weight - "The Zarcero Portfolio Thing"
+        ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: 'top top',
+            end: `+=${totalScroll + 500}`,
+            onUpdate(self) {
+                const v = self.getVelocity() / 6000;
+                gsap.to(track, {
+                    skewX: Math.max(-3, Math.min(3, v * -2)),
+                    ease: 'power3.out',
+                    duration: 0.5,
+                    overwrite: 'auto',
+                });
+            },
+        });
+
+        return () => {
+            tl.kill();
+            ScrollTrigger.getById('work-skew')?.kill();
+        };
     }, { scope: containerRef, dependencies: [isNearViewport] });
 
     return (
@@ -82,7 +100,7 @@ export default function HorizontalOffers() {
             <div
                 ref={trackRef}
                 className="flex h-full"
-                style={{ width: '300vw' }}
+                style={{ width: '300vw', willChange: 'transform' }}
             >
                 {/* ===== PANEL 1: Text + Enlarging Card ===== */}
                 <div className="w-screen h-full flex flex-col md:flex-row flex-shrink-0 relative">

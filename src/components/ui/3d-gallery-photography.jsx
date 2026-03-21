@@ -143,7 +143,7 @@ function GalleryScene({
     blurSettings = { blurIn: { start: 0.0, end: 0.1 }, blurOut: { start: 0.9, end: 1.0 }, maxBlur: 3.0 },
     scrollProgress = null, // Add support for external scroll control
 }) {
-    const [scrollVelocity, setScrollVelocity] = useState(0);
+    const scrollVelocityRef = useRef(0);
     const [autoPlay, setAutoPlay] = useState(!scrollProgress && true);
     const lastInteraction = useRef(Date.now());
     
@@ -207,18 +207,18 @@ function GalleryScene({
 
     const handleWheel = useCallback((event) => {
         event.preventDefault();
-        setScrollVelocity((prev) => prev + event.deltaY * 0.01 * speed);
+        scrollVelocityRef.current += event.deltaY * 0.01 * speed;
         setAutoPlay(false);
         lastInteraction.current = Date.now();
     }, [speed]);
 
     const handleKeyDown = useCallback((event) => {
         if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-            setScrollVelocity((prev) => prev - 2 * speed);
+            scrollVelocityRef.current -= 2 * speed;
             setAutoPlay(false);
             lastInteraction.current = Date.now();
         } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-            setScrollVelocity((prev) => prev + 2 * speed);
+            scrollVelocityRef.current += 2 * speed;
             setAutoPlay(false);
             lastInteraction.current = Date.now();
         }
@@ -248,7 +248,7 @@ function GalleryScene({
 
     useFrame((state, delta) => {
         let moveDistance = 0;
-        let visualVelocity = scrollVelocity;
+        let visualVelocity = scrollVelocityRef.current;
         
         // Check if scrollProgress is provided (either as number or ref)
         let progressValue = null;
@@ -289,11 +289,11 @@ function GalleryScene({
             lastScrollProgress.current = progressValue;
         } else {
             // Internal control mode
-            if (autoPlay) setScrollVelocity((prev) => prev + 0.3 * delta);
-            setScrollVelocity((prev) => prev * 0.95);
+            if (autoPlay) scrollVelocityRef.current += 0.3 * delta;
+            scrollVelocityRef.current *= 0.95;
             
-            visualVelocity = scrollVelocity;
-            moveDistance = scrollVelocity * delta * 10;
+            visualVelocity = scrollVelocityRef.current;
+            moveDistance = scrollVelocityRef.current * delta * 10;
         }
 
         const time = state.clock.getElapsedTime();
@@ -430,6 +430,7 @@ export default function InfiniteGallery({
     speed = 1,
     visibleCount = 8,
     scrollProgress = null,
+    inView = true,
 }) {
     const [webglSupported, setWebglSupported] = useState(true);
     useEffect(() => {
@@ -448,6 +449,7 @@ export default function InfiniteGallery({
                 camera={{ position: [0, 0, 10], fov: 50, near: 0.1, far: 1000 }} 
                 gl={{ antialias: true, alpha: true }}
                 dpr={[1, 2]} // Use dpr for sharper rendering on high-DPI screens
+                frameloop={inView ? "always" : "demand"}
             >
                 {/* Add ambient light to ensure visibility */}
                 <ambientLight intensity={0.5} />

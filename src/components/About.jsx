@@ -9,15 +9,36 @@ const About = () => {
     const navigate = useNavigate();
     const videoRef = useRef(null);
 
-    // Force-resume background video when tab returns from being backgrounded
+    // Pause video when off-screen, resume when visible
     useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        // Resume on tab re-focus
         const handleVisibility = () => {
-            if (document.visibilityState === 'visible' && videoRef.current) {
-                videoRef.current.play().catch(() => {});
+            if (document.visibilityState === 'visible' && video && !video.paused) {
+                video.play().catch(() => {});
             }
         };
         document.addEventListener('visibilitychange', handleVisibility);
-        return () => document.removeEventListener('visibilitychange', handleVisibility);
+
+        // Pause/play based on viewport intersection
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
+            },
+            { rootMargin: '200px 0px' } // Start playing 200px before entering viewport
+        );
+        observer.observe(video);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibility);
+            observer.disconnect();
+        };
     }, []);
 
     const handleLaunchOS = (e) => {

@@ -15,10 +15,8 @@ import CustomCursor from '../components/CustomCursor'
 import React from 'react'
 import About from '../components/About'
 import ShadwayGallery from '../components/ShadwayGallery'
-import HorizontalOffers from '../components/HorizontalOffers'
 import FeaturedWork from '../components/FeaturedWork'
-import Services from '../components/Services'
-import Projects from '../components/Projects'
+import YashWork from '../components/YashWork'
 import Experience from '../components/Experience'
 import Testimonials from '../components/Testimonials'
 import Contact from '../components/Contact'
@@ -54,38 +52,28 @@ function Home() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
-  // Initialize Lenis Smooth Scroll (ONLY FOR DESKTOP/MICE)
+  // Initialize Lenis Smooth Scroll
   useEffect(() => {
-    // ⚠️ CRITICAL FIX: Running Lenis on touch devices creates a lethal struggle between 
-    // native glass/hardware scroll physics (iOS/Android) and JavaScript math. Bypass it!
-    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia("(pointer: coarse)").matches);
-    
-    if (isTouchDevice) {
-        // Just keep GSAP ScrollTrigger synchronized natively with hardware scroll
-        return; 
-    }
-
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      touchMultiplier: 2,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const update = (time) => {
       lenis.raf(time * 1000);
-    });
-    
+    };
+
+    gsap.ticker.add(update);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       lenis.destroy();
       lenis.off('scroll', ScrollTrigger.update);
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+      gsap.ticker.remove(update);
     };
   }, []);
 
@@ -176,10 +164,7 @@ function Home() {
   const staticContent = React.useMemo(() => (
     <>
       <About />
-      <ShadwayGallery />
-      <HorizontalOffers />
-      <Services />
-      <Projects />
+      <YashWork />
       <Experience />
       <FeaturedWork />
       <Testimonials />
@@ -218,6 +203,7 @@ function Home() {
               <Hero isDesktop={isDesktop} isLoading={!isPhysicsReady} />
               {staticContent}
               <Contact activeSection={activeSection} isDesktop={isDesktop} />
+              <ShadwayGallery />
               <Footer />
             </main>
           </m.div>

@@ -69,8 +69,8 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
-  const { viewport } = useThree();
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, inView }, ref) {
+  const { viewport, invalidate } = useThree();
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -79,8 +79,10 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
   }, [ref, viewport]);
 
   useFrame((_, delta) => {
+    if (!inView) return; // Skip all GPU work when off-screen
     if (ref.current && ref.current.material && ref.current.material.uniforms && ref.current.material.uniforms.uTime) {
         ref.current.material.uniforms.uTime.value += delta;
+        invalidate(); // Request next frame only when actively animating
     }
   });
 
@@ -109,8 +111,8 @@ const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, r
   }), [speed, scale, noiseIntensity, color, rotation]);
 
   return (
-    <Canvas dpr={[1, 1.2]} frameloop="always">
-      <SilkPlane ref={meshRef} uniforms={uniforms} />
+    <Canvas dpr={[1, 1.2]} frameloop={inView ? "always" : "demand"}>
+      <SilkPlane ref={meshRef} uniforms={uniforms} inView={inView} />
     </Canvas>
   );
 };

@@ -8,10 +8,10 @@ export const navLinks = [
 
 export const projects = [
     {
-        title: 'Immersive Finance Dashboard',
-        summary: 'Realtime trading cockpit with adaptive theming, sentiment signals, and L2 order flow overlays.',
-        stack: ['React', 'D3', 'WebSockets'],
-        result: 'Boosted analyst velocity by 34% through dense-yet-readable data viz.',
+        title: 'Exanor',
+        summary: 'AI-powered billing & accounting software with a hyperlocal delivery platform — end-to-end from invoicing to last-mile logistics.',
+        stack: ['Flutter', 'React', 'Node.js', 'Firebase', 'Express'],
+        result: 'Serving 500+ businesses with automated invoicing, inventory sync, and real-time delivery tracking.',
     },
     {
         title: 'Automotive AR Showroom',

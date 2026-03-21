@@ -33,9 +33,10 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], 
         dpr={[1, isMobile ? 1 : 1.5]}
         gl={{ alpha: transparent }}
         onCreated={({ gl }) => gl.setClearColor(new Color(0x000000), transparent ? 0 : 1)}
+        frameloop={inView ? "always" : "demand"}
       >
         <ambientLight intensity={Math.PI} />
-        <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60} paused={isLoading}>
+        <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60} paused={isLoading || !inView}>
           <Band isMobile={isMobile} />
         </Physics>
         <Environment blur={0.75}>

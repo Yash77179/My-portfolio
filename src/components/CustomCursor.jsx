@@ -7,10 +7,11 @@ const CustomCursor = () => {
     const followerPos = useRef({ x: 0, y: 0 })
 
     useEffect(() => {
+        // Don't run cursor animation loop on non-desktop devices
+        if (window.innerWidth < 1024) return;
+
         // Custom cursor movement
         const handleMouseMove = (e) => {
-            if (window.innerWidth < 1024) return
-
             mousePos.current = { x: e.clientX, y: e.clientY }
             if (cursorRef.current) {
                 cursorRef.current.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`

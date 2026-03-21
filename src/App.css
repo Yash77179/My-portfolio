@@ -123,11 +123,18 @@ body.cursor-grabbing * {
 .about-reveal-left {
   opacity: 0;
   animation: about-reveal-left 0.9s ease-out 0.1s forwards;
+  will-change: transform, opacity;
 }
 
 .about-reveal-right {
   opacity: 0;
   animation: about-reveal-right 1s ease-out 0.2s forwards;
+  will-change: transform, opacity;
+}
+
+/* Layout containment for sections — prevents cross-section layout thrashing */
+section {
+  contain: layout style;
 }
 
 /* Soft shimmering accent line under the about heading */

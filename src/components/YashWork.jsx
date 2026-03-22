@@ -6,122 +6,97 @@ import { projects } from "../data/portfolioData";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CARD_THEMES = [
-  {
-    bg: "linear-gradient(160deg, #08081a 0%, #0e1025 50%, #050510 100%)",
-    accent: "#38bdf8",
-    accentSoft: "rgba(56,189,248,0.08)",
-  },
-  {
-    bg: "linear-gradient(160deg, #0a0614 0%, #150a20 50%, #060510 100%)",
-    accent: "#c084fc",
-    accentSoft: "rgba(192,132,252,0.08)",
-  },
-  {
-    bg: "linear-gradient(160deg, #0a1410 0%, #0c1e18 50%, #050a08 100%)",
-    accent: "#34d399",
-    accentSoft: "rgba(52,211,153,0.08)",
-  },
-];
-
 const ENHANCED_PROJECTS = projects.map((p, i) => ({
   ...p,
   number: String(i + 1).padStart(2, "0"),
-  theme: CARD_THEMES[i % CARD_THEMES.length],
 }));
 
-// Memoized card to prevent re-renders from hover state leaking
 const ProjectCard = memo(function ProjectCard({ project, index, titleRef, infoRef }) {
   return (
     <div
-      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-end"
+      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-end bg-black"
       style={{ contain: "layout style paint" }}
     >
-      {/* Solid gradient background — zero images, zero lag */}
-      <div className="absolute inset-0" style={{ background: project.theme.bg }} />
+      {/* Background Image - Picsum for placeholder */}
+      <img
+        src={`https://picsum.photos/1920/1080?random=${index + 42}`}
+        alt={project.title}
+        className="absolute inset-0 w-full h-full object-cover scale-[1.02] opacity-80"
+        style={{ transform: "translateZ(0)" }}
+      />
 
-      {/* Bottom accent glow */}
+      {/* Elegant Gradient Overlays for Readability */}
       <div
-        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          height: "40%",
-          background: `linear-gradient(to top, ${project.theme.accentSoft} 0%, transparent 100%)`,
+          background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)",
         }}
       />
 
-      {/* Card number */}
+      {/* Massive Background Number */}
       <div
-        className="absolute top-12 right-12 lg:top-20 lg:right-20 font-light tracking-widest text-white/[0.06]"
-        style={{ fontSize: "clamp(3rem, 8vw, 6rem)", zIndex: 1 }}
+        className="absolute -top-10 -left-10 md:top-4 md:left-4 lg:top-12 lg:left-12 font-light tracking-tighter text-white z-0 select-none pointer-events-none"
+        style={{ fontSize: "clamp(8rem, 20vw, 18rem)", lineHeight: 0.8, opacity: 0.04 }}
       >
         {project.number}
       </div>
 
-      {/* Content area */}
-      <div className="relative z-10 px-8 md:px-16 lg:px-24 pb-10 md:pb-16 lg:pb-20">
-        {/* Title */}
-        <h2
-          ref={titleRef}
-          className="font-light tracking-tight leading-[0.9] mb-8"
-          style={{
-            fontSize: "clamp(3rem, 9vw, 7.5rem)",
-            background: `linear-gradient(180deg, #ffffff 30%, ${project.theme.accent}90 100%)`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-        >
-          {project.title}
-        </h2>
+      {/* Main Content Area */}
+      <div className="relative z-10 w-full px-6 md:px-16 lg:px-24 pb-12 md:pb-20 lg:pb-24 flex flex-col h-full justify-end">
+        <div className="max-w-5xl">
+          <h2
+            ref={titleRef}
+            className="font-light tracking-tight leading-[0.9] mb-8 text-white"
+            style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)" }}
+          >
+            {project.title}
+          </h2>
 
-        {/* Info bar */}
-        <div
-          ref={infoRef}
-          className="flex flex-col md:flex-row justify-between items-start md:items-end w-full max-w-7xl border-t pt-6 md:pt-8"
-          style={{ borderColor: `${project.theme.accent}20` }}
-        >
-          <div className="max-w-2xl">
-            <p className="text-lg md:text-xl text-white/80 mb-3 font-light tracking-tight leading-relaxed">
+          <div ref={infoRef} className="flex flex-col gap-6">
+            <p className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light tracking-wide leading-relaxed max-w-3xl">
               {project.summary}
             </p>
-            <div className="flex items-center gap-3 mb-5">
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{
-                  backgroundColor: project.theme.accent,
-                  boxShadow: `0 0 6px ${project.theme.accent}`,
-                }}
-              />
-              <p className="text-sm text-white/40">{project.result}</p>
+
+            <div className="flex items-center gap-4 mt-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.4)]" />
+              <p className="text-sm md:text-base text-white/70 font-medium tracking-wide uppercase">{project.result}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
+
+            <div className="flex flex-wrap gap-3 mt-6">
               {project.stack.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-full text-[0.6rem] uppercase tracking-[0.2em] text-white/40"
-                  style={{
-                    border: `1px solid ${project.theme.accent}20`,
-                    backgroundColor: `${project.theme.accent}08`,
-                  }}
+                  className="px-5 py-2 rounded-full text-[0.65rem] md:text-xs uppercase tracking-[0.2em] text-white/90 bg-black/40"
+                  style={{ border: "1px solid rgba(255,255,255,0.15)" }}
                 >
                   {tag}
                 </span>
               ))}
             </div>
           </div>
-
-          <div className="mt-8 md:mt-0 shrink-0">
-            <button
-              className="group inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/15 bg-white/5 hover:bg-white hover:text-black transition-colors duration-400"
-            >
-              <div className="flex flex-col items-start">
-                <span className="text-[0.6rem] uppercase tracking-[0.2em] leading-none mb-0.5">View</span>
-                <span className="text-[0.6rem] uppercase tracking-[0.2em] leading-none">Case Study</span>
-              </div>
-              <span className="text-base leading-none transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
-            </button>
-          </div>
         </div>
+      </div>
+
+      {/* Navigational Arrow at Exact Bottom Right Corner */}
+      <div className="absolute right-8 bottom-12 md:right-16 md:bottom-20 z-20 flex flex-col items-center gap-4 opacity-50 hover:opacity-100 transition-opacity duration-500 cursor-pointer pointer-events-none hidden md:flex">
+        <span className="text-[0.6rem] uppercase tracking-[0.4em] font-light text-white rotate-90 translate-y-4">Next</span>
+        <svg 
+          width="50" 
+          height="50" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="white" 
+          strokeWidth="1" 
+          className="mt-6"
+        >
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" />
+        </svg>
       </div>
     </div>
   );
@@ -141,12 +116,8 @@ export default function YashWork() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduced) {
-      titleRefs.current.forEach((t) => {
-        if (t) gsap.set(t, { opacity: 1 });
-      });
-      infoRefs.current.forEach((info) => {
-        if (info) gsap.set(info, { opacity: 1 });
-      });
+      titleRefs.current.forEach((t) => { if (t) gsap.set(t, { opacity: 1 }); });
+      infoRefs.current.forEach((info) => { if (info) gsap.set(info, { opacity: 1 }); });
       return;
     }
 
@@ -156,16 +127,14 @@ export default function YashWork() {
 
     titleRefs.current.forEach((title, i) => {
       if (!title) return;
-      gsap.set(title, { yPercent: i === 0 ? 0 : 25, opacity: i === 0 ? 1 : 0 });
+      gsap.set(title, { yPercent: i === 0 ? 0 : 40, opacity: i === 0 ? 1 : 0 });
     });
     infoRefs.current.forEach((info, i) => {
       if (!info) return;
-      gsap.set(info, { yPercent: i === 0 ? 0 : 15, opacity: i === 0 ? 1 : 0 });
+      gsap.set(info, { yPercent: i === 0 ? 0 : 30, opacity: i === 0 ? 1 : 0 });
     });
 
-    const startDwell = isMobile ? 0.05 : 0.10;
-    const moveFraction = isMobile ? 0.90 : 0.80;
-    const endDwell = 1 - startDwell - moveFraction;
+    const moveFraction = 0.85;
     const pinTotal = totalTravel / moveFraction;
 
     const tl = gsap.timeline({
@@ -179,66 +148,44 @@ export default function YashWork() {
       },
     });
 
-    tl.to({}, { duration: startDwell }, 0);
-    tl.to(track, { x: -totalTravel, ease: "none", duration: moveFraction }, startDwell);
-    tl.to({}, { duration: endDwell }, startDwell + moveFraction);
+    tl.to(track, { x: -totalTravel, ease: "none", duration: 1 }, 0);
 
     for (let i = 1; i < numCards; i++) {
       const title = titleRefs.current[i];
       const info = infoRefs.current[i];
-      const entryProgress = startDwell + (i - 0.6) / (numCards - 1) * moveFraction;
+      const entryProgress = (i - 0.6) / (numCards - 1);
 
       if (title) {
-        tl.to(title, { yPercent: 0, opacity: 1, ease: "power3.out", duration: 0.15 }, entryProgress);
+        tl.to(title, { yPercent: 0, opacity: 1, ease: "power3.out", duration: 0.25 }, entryProgress);
       }
       if (info) {
-        tl.to(info, { yPercent: 0, opacity: 1, ease: "power3.out", duration: 0.2 }, entryProgress + 0.04);
+        tl.to(info, { yPercent: 0, opacity: 1, ease: "power3.out", duration: 0.25 }, entryProgress + 0.05);
       }
     }
 
-    // Velocity-based skew
-    ScrollTrigger.create({
-      id: "yash-work-skew",
-      trigger: section,
-      start: "top top",
-      end: `+=${pinTotal}`,
-      onUpdate(self) {
-        const v = self.getVelocity() / 6000;
-        gsap.to(track, {
-          skewX: Math.max(-2, Math.min(2, v * -2)),
-          ease: "power4.out",
-          duration: 0.8,
-          overwrite: "auto",
-        });
-      },
-    });
-
     return () => {
       tl.kill();
-      ScrollTrigger.getById("yash-work-skew")?.kill();
     };
   }, { scope: sectionRef });
 
   return (
     <section
       ref={sectionRef}
-      className="overflow-hidden relative"
+      className="overflow-hidden relative bg-black"
       id="projects-gallery"
-      style={{ height: "100vh", position: "relative", background: "#030303" }}
+      style={{ height: "100vh" }}
     >
-      {/* Section label - Placed horizontally below the Navbar/Logo */}
-      <div className="absolute top-28 left-6 md:left-12 lg:left-16 z-20">
-        <div className="flex items-center gap-4">
-          <p className="text-[0.65rem] uppercase tracking-[0.4em] text-white/50 font-light">Selected Work</p>
-          <span className="h-px w-12 bg-white/20" />
+      {/* Top Left Label */}
+      <div className="absolute top-10 left-6 md:top-14 md:left-16 z-30 mix-blend-difference pointer-events-none">
+        <div className="flex items-center gap-6">
+          <p className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] text-white/70 font-light">Selected Work</p>
+          <span className="h-px w-12 md:w-20 bg-white/30" />
         </div>
       </div>
 
-      {/* Horizontal scroll track */}
       <div
         ref={trackRef}
-        className="flex"
-        style={{ height: "100vh", width: "max-content", willChange: "transform" }}
+        className="flex h-full w-max will-change-transform"
       >
         {ENHANCED_PROJECTS.map((project, i) => (
           <ProjectCard

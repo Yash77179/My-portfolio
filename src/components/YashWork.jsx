@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { projects } from "../data/portfolioData";
+import ProjectOverlay from "./ProjectOverlay";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,15 +12,16 @@ const ENHANCED_PROJECTS = projects.map((p, i) => ({
   number: String(i + 1).padStart(2, "0"),
 }));
 
-const ProjectCard = memo(function ProjectCard({ project, index, titleRef, infoRef }) {
+const ProjectCard = memo(function ProjectCard({ project, index, titleRef, infoRef, onClick }) {
   return (
     <div
-      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-end bg-black"
+      onClick={() => onClick(index)}
+      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-end bg-black cursor-pointer"
       style={{ contain: "layout style paint" }}
     >
-      {/* Background Image - Picsum for placeholder */}
+      {/* Background Image - Use project image or Picsum for placeholder */}
       <img
-        src={`https://picsum.photos/1920/1080?random=${index + 42}`}
+        src={project.image || `https://picsum.photos/1920/1080?random=${index + 42}`}
         alt={project.title}
         className="absolute inset-0 w-full h-full object-cover scale-[1.02] opacity-80"
         style={{ transform: "translateZ(0)" }}
@@ -107,6 +109,7 @@ export default function YashWork() {
   const trackRef = useRef(null);
   const titleRefs = useRef([]);
   const infoRefs = useRef([]);
+  const [activeProjectIndex, setActiveProjectIndex] = useState(null);
 
   useGSAP(() => {
     const section = sectionRef.current;
@@ -192,11 +195,18 @@ export default function YashWork() {
             key={project.title}
             project={project}
             index={i}
+            onClick={setActiveProjectIndex}
             titleRef={(el) => { if (el) titleRefs.current[i] = el; }}
             infoRef={(el) => { if (el) infoRefs.current[i] = el; }}
           />
         ))}
       </div>
+      
+      <ProjectOverlay 
+        activeProjectIndex={activeProjectIndex} 
+        onClose={() => setActiveProjectIndex(null)} 
+        projects={ENHANCED_PROJECTS} 
+      />
     </section>
   );
 }

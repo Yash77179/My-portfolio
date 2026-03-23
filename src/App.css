@@ -15,26 +15,30 @@ body.cursor-grabbing * {
 /* Custom cursor */
 .cursor {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 2147483647;
   mix-blend-mode: difference;
-  transition: transform 0.05s ease-out, width 0.2s ease, height 0.2s ease;
-  transform-origin: center;
+  transition: width 0.2s ease, height 0.2s ease;
+  will-change: transform;
 }
 
 .cursor-follower {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   pointer-events: none;
-  z-index: 9998;
-  transition: transform 0.15s ease-out;
+  z-index: 2147483646;
+  will-change: transform;
 }
 
 @media (max-width: 1023px) {

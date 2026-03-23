@@ -1,3 +1,7 @@
+import exanorImg from '../assets/exanor_billboard.png';
+import exanorVideo from '../assets/exanor/1.webm';
+import exanorVideo2 from '../assets/exanor/2.webm';
+
 export const navLinks = [
     { label: 'Home', href: '#home' },
     { label: 'About', href: '#about' },
@@ -9,6 +13,9 @@ export const navLinks = [
 export const projects = [
     {
         title: 'Exanor',
+        image: exanorImg,
+        galleryVideo: exanorVideo,
+        galleryVideo2: exanorVideo2,
         summary: 'AI-powered billing & accounting software with a hyperlocal delivery platform — end-to-end from invoicing to last-mile logistics.',
         stack: ['Flutter', 'React', 'Node.js', 'Firebase', 'Express'],
         result: 'Serving 500+ businesses with automated invoicing, inventory sync, and real-time delivery tracking.',

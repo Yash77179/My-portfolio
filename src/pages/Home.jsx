@@ -13,6 +13,7 @@ import Hero from '../components/Hero'
 import BackgroundEffects from '../components/BackgroundEffects'
 import CustomCursor from '../components/CustomCursor'
 import React from 'react'
+import Statement from '../components/Statement'
 import About from '../components/About'
 import ShadwayGallery from '../components/ShadwayGallery'
 import FeaturedWork from '../components/FeaturedWork'
@@ -163,6 +164,7 @@ function Home() {
 
   const staticContent = React.useMemo(() => (
     <>
+      <Statement />
       <About />
       <YashWork />
       <Experience />

@@ -130,10 +130,8 @@ function PremiumProjectContent({
         {/* ── Immersive Visual Gallery ── */}
         <div className="w-full pb-32 md:pb-48">
           <div data-reveal className="w-full px-6 md:px-16 lg:px-24 mb-12 md:mb-16">
-            <div className="w-full relative overflow-hidden rounded-2xl bg-[#050505] border border-white/10 group hover:border-white/20 transition-all duration-700 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-              {/* Inner Ambient Shadow for Premium Feel */}
-              <div className="absolute inset-0 pointer-events-none z-10 rounded-2xl ring-1 ring-inset ring-white/5 opacity-50" />
-
+            <div className="w-full relative overflow-hidden bg-[#050505] border border-white/10 group hover:border-white/20 hover:bg-white/[0.02] transition-colors duration-700">
+              <CardDecorator />
               {project.galleryVideo ? (
                 <div className="w-full aspect-video flex items-center justify-center bg-black">
                   <video
@@ -158,46 +156,49 @@ function PremiumProjectContent({
           </div>
 
 
-          <div data-reveal className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 px-6 md:px-16 lg:px-24">
-            <div className="w-full aspect-[4/5] relative overflow-hidden rounded-2xl bg-[#050505] border border-white/10 group hover:border-white/20 transition-all duration-700 shadow-2xl">
-              <div className="absolute inset-0 pointer-events-none z-10 rounded-2xl ring-1 ring-inset ring-white/5 opacity-40" />
+          <div data-reveal className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 md:px-16 lg:px-24">
+            {/* Left Media (Video 2 or Image) */}
+            <div className="w-full h-[60vh] md:h-[70vh] lg:h-[85vh] relative overflow-hidden bg-[#050505] border border-white/10 group shadow-2xl flex items-center justify-center p-6 md:p-8 lg:p-10 transition-colors duration-700 hover:border-white/20 hover:bg-white/[0.02]">
+              <CardDecorator />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+              
               {project.galleryVideo2 ? (
-                <div className="absolute inset-0 flex items-center justify-center p-20 lg:p-28">
-                  <video
-                    src={project.galleryVideo2}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-contain rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.8)] ring-1 ring-white/10 transition-transform duration-1000 group-hover:scale-[1.02]"
-                  />
-                </div>
+                <video
+                  src={project.galleryVideo2}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="h-full w-auto max-w-full object-contain shadow-[0_20px_80px_rgba(0,0,0,0.8)] border border-white/10 transition-transform duration-1000 group-hover:scale-[1.02]"
+                />
               ) : (
                 <img
                   src={`https://picsum.photos/1000/1200?random=${index + 200}`}
                   alt="Detail view 1"
-                  className="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]"
+                  className="h-full w-full object-cover border border-white/10 opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]"
                 />
               )}
             </div>
-            <div className="w-full aspect-[4/5] relative overflow-hidden rounded-2xl bg-[#050505] border border-white/10 group hover:border-white/20 transition-all duration-700 shadow-2xl">
-              <div className="absolute inset-0 pointer-events-none z-10 rounded-2xl ring-1 ring-inset ring-white/5 opacity-40" />
+
+            {/* Right Media (Video 3 or Image) */}
+            <div className="w-full h-[60vh] md:h-[70vh] lg:h-[85vh] relative overflow-hidden bg-[#050505] border border-white/10 group shadow-2xl flex items-center justify-center p-6 md:p-8 lg:p-10 transition-colors duration-700 hover:border-white/20 hover:bg-white/[0.02]">
+              <CardDecorator />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+
               {project.galleryVideo3 ? (
-                <div className="absolute inset-0 flex items-center justify-center p-20 lg:p-28">
-                  <video
-                    src={project.galleryVideo3}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-contain rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.8)] ring-1 ring-white/10 transition-transform duration-1000 group-hover:scale-[1.02]"
-                  />
-                </div>
+                <video
+                  src={project.galleryVideo3}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="h-full w-auto max-w-full object-contain shadow-[0_20px_80px_rgba(0,0,0,0.8)] border border-white/10 transition-transform duration-1000 group-hover:scale-[1.02]"
+                />
               ) : (
                 <img
                   src={`https://picsum.photos/1000/1200?random=${index + 300}`}
                   alt="Detail view 2"
-                  className="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]"
+                  className="h-full w-full object-cover border border-white/10 opacity-90 transition-transform duration-1000 group-hover:scale-[1.02]"
                 />
               )}
             </div>
@@ -253,6 +254,15 @@ function PremiumProjectContent({
     </div>
   );
 }
+
+const CardDecorator = () => (
+    <>
+        <span className="border-[#c8b598]/40 absolute -left-px -top-px block size-3 border-l-2 border-t-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/40 absolute -right-px -top-px block size-3 border-r-2 border-t-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/40 absolute -bottom-px -left-px block size-3 border-b-2 border-l-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/40 absolute -bottom-px -right-px block size-3 border-b-2 border-r-2 z-20 pointer-events-none"></span>
+    </>
+);
 
 // ─── Overlay shell ───
 

@@ -4,8 +4,8 @@ import { useTexture, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 
 const DEFAULT_DEPTH_RANGE = 50;
-const MAX_HORIZONTAL_OFFSET = 8;
-const MAX_VERTICAL_OFFSET = 8;
+const MAX_HORIZONTAL_OFFSET = 20;
+const MAX_VERTICAL_OFFSET = 20;
 
 const createClothMaterial = () => {
     return new THREE.ShaderMaterial({
@@ -203,14 +203,13 @@ function GalleryScene({
 
     const totalImages = normalizedImages.length;
     // Dynamically scale depth range so larger galleries have proper breathing room
-    const depthRange = Math.max(DEFAULT_DEPTH_RANGE, visibleCount * 5.5);
+    const depthRange = Math.max(DEFAULT_DEPTH_RANGE, visibleCount * 8.5);
     
-    // Adjust fadeOut to happen BEFORE the image hits the camera Z=10
-    // If depthRange is 132 (24 items), worldZ goes from -66 to +66.
-    // We want it perfectly visible until worldZ = 0 (10 units in front of camera),
-    // and completely invisible by worldZ = 6 (4 units in front of camera).
-    const fadeOutStartTarget = (0 + depthRange / 2) / depthRange;
-    const fadeOutEndTarget = (6 + depthRange / 2) / depthRange;
+    // Adjust fadeOut to happen ONLY after the image fully passes the screen (Z=10 and beyond)
+    // We want it to stay full opacity as it hits our face, and then quickly vanish as it sails
+    // entirely out of bounds past the lens.
+    const fadeOutStartTarget = (12 + depthRange / 2) / depthRange;
+    const fadeOutEndTarget = (14 + depthRange / 2) / depthRange;
     
     // Store references to the meshes
     const meshRefs = useRef([]);
@@ -288,9 +287,11 @@ function GalleryScene({
             progressValue = scrollProgress.current;
         }
 
+        let cinematicZOffset = 0;
+
         if (progressValue !== null) {
             // External control mode (GSAP)
-            const totalTravel = depthRange * 4; // Traversing the depth multiple times
+            const totalTravel = depthRange * 1.75; // Traversing the depth exactly 1.75 times as requested
             const currentPos = progressValue * totalTravel;
             
             // Calculate movement since last frame
@@ -300,6 +301,23 @@ function GalleryScene({
              
             moveDistance = currentPos - prevPos;
             
+            // --- Cinematic Entrance Offset ---
+            // User requested images to start closer/larger
+            if (progressValue < 0.15) {
+                // Starts partially pushed out (-35 units), easing quickly into normal position
+                const t = progressValue / 0.15;
+                const easeOut = 1 - Math.pow(1 - t, 3); 
+                cinematicZOffset = -35 * (1 - easeOut);
+            }
+            // "Not all should go out BEFORE going down... we should be able to scroll down."
+            // "But everything should go out of screen"
+            else if (progressValue > 0.95) {
+                // The pinning unlocks exactly at 1.0! The user starts seamlessly scrolling down to the next section.
+                // We use the unbroken progress reading > 1.0 to radically accelerate the final images cleanly out of the camera bounds.
+                const t = (progressValue - 0.95);
+                cinematicZOffset = t * 300; 
+            }
+
             // Calculate a fake velocity for the shader effects, but CLAMP IT TIGHTLY
             // delta is time in seconds (approx 0.016). dividing by it gives units/sec.
             const rawVelocity = moveDistance / (delta || 0.016);
@@ -388,7 +406,7 @@ function GalleryScene({
             // Apply updates to the Mesh directly
             const mesh = meshRefs.current[i];
             if (mesh) {
-                 const worldZ = plane.z - depthRange / 2;
+                 const worldZ = plane.z - depthRange / 2 + cinematicZOffset;
                  mesh.position.set(plane.x, plane.y, worldZ);
                  
                  const targetTexture = textures[plane.imageIndex];
@@ -402,8 +420,8 @@ function GalleryScene({
                          // Update aspect ratio scale
                          if (targetTexture.image) {
                              const aspect = targetTexture.image.width / targetTexture.image.height;
-                             const scaleX = aspect > 1 ? 2 * aspect : 2;
-                             const scaleY = aspect > 1 ? 2 : 2 / aspect;
+                             const scaleX = aspect > 1 ? 4.5 * aspect : 4.5;
+                             const scaleY = aspect > 1 ? 4.5 : 4.5 / aspect;
                              mesh.scale.set(scaleX, scaleY, 1);
                          }
                      }
@@ -426,7 +444,7 @@ function GalleryScene({
 
                 const worldZ = plane.z - depthRange / 2;
                 const aspect = texture.image ? texture.image.width / texture.image.height : 1;
-                const scale = aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
+                const scale = aspect > 1 ? [4.5 * aspect, 4.5, 1] : [4.5, 4.5 / aspect, 1];
 
                 return (
                     <ImagePlane

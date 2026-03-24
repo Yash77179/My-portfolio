@@ -4,6 +4,8 @@ import { ContainerScroll } from './ui/container-scroll-animation';
 import AboutContent from './AboutContent';
 import { Play } from 'lucide-react';
 import yashVideo from '../assets/yash.webm';
+import tabletWebm from '../assets/tablet/tablet.webm';
+import { GlassButton } from './ui/glass-button';
 
 const About = () => {
     const navigate = useNavigate();
@@ -102,31 +104,66 @@ const About = () => {
                 <div className="relative w-full h-full group overflow-hidden rounded-[2rem] md:rounded-2xl">
                      
                      <div className="w-full h-full pointer-events-none">
-                         <AboutContent />
+                         <video 
+                            src={tabletWebm} 
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline 
+                            className="w-full h-full object-cover"
+                         />
                      </div>
 
-                     {/* Interactive Hover OS Launcher Overlay */}
+                     {/* Ultra-Premium Static Overlay */}
                      <div 
                         onClick={handleLaunchOS}
-                        className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 z-[9999] cursor-pointer"
+                        className="absolute inset-0 z-[9999] cursor-pointer flex flex-col items-center justify-between py-10 md:py-16 px-6"
                         style={{ pointerEvents: 'auto' }}
                      >
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none" />
+                        {/* Soft, permanent vignette to ensure perfect text contrast over the video */}
+                        <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)] pointer-events-none" />
+
+                        {/* Top Label - Permanently Visible */}
+                        <div className="relative z-10 w-full flex justify-center">
+                            <span className="text-[0.6rem] md:text-xs uppercase tracking-[0.5em] text-white/50 font-medium">
+                                Interactive Session — 01
+                            </span>
+                        </div>
                         
-                        <div className="text-center transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col items-center justify-center h-full w-full relative z-10">
+                        {/* Center Layout - Permanently Visible */}
+                        <div className="relative z-10 flex flex-col items-center justify-center flex-grow">
                             
-                            <h3 className="text-3xl md:text-6xl font-bold tracking-tighter text-white mb-4 drop-shadow-2xl">
-                                enter the<br className="md:hidden" /> <span className="font-serif italic font-light text-cyan-300">experience.</span>
+                            <h3 className="text-3xl md:text-5xl lg:text-6xl font-light text-white text-center tracking-tight drop-shadow-2xl mb-12">
+                                Step inside the <span className="font-serif italic text-[#c8b598] mr-2">experience.</span>
                             </h3>
 
-                            <p className="text-white/60 text-[0.6rem] md:text-sm tracking-[0.3em] uppercase mb-8 md:mb-10 font-medium">
-                                Interactive OS Portfolio
-                            </p>
+                            <GlassButton
+                                size="default"
+                                contentClassName="flex items-center gap-3 text-white/90 drop-shadow-md"
+                            >
+                                <span className="text-xs font-semibold tracking-[0.15em] uppercase">Initialize System</span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                            </GlassButton>
+                        </div>
 
-                            <button className="relative px-6 md:px-8 py-3 md:py-4 bg-white text-black hover:bg-neutral-200 hover:scale-105 transition-all duration-300 rounded-full font-bold uppercase tracking-[0.2em] text-[0.65rem] md:text-xs flex items-center gap-2 md:gap-3 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]">
-                                <Play size={16} className="fill-black" />
-                                Launch System
-                            </button>
+                        {/* Bottom Label - Permanently Visible */}
+                        <div className="relative z-10 w-full flex justify-center">
+                            <span className="text-[0.6rem] md:text-xs uppercase tracking-[0.5em] text-white/30 font-medium">
+                                Yash.OS Architecture
+                            </span>
                         </div>
                      </div>
                 </div>

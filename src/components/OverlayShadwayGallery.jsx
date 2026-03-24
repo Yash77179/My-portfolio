@@ -11,6 +11,12 @@ const EXANOR_IMAGES = Object.values(modules).map((mod, index) => ({
     alt: `Exanor Screenshot ${index + 1}`
 }));
 
+const recipeModules = import.meta.glob('../assets/Reciepe Sharing/rs/*.{png,jpg,jpeg,webp}', { eager: true });
+const RECIPE_IMAGES = Object.values(recipeModules).map((mod, index) => ({
+    src: mod.default,
+    alt: `Recipe Sharing Screenshot ${index + 1}`
+}));
+
 const SAMPLE_IMAGES = [
     { src: 'https://images.unsplash.com/photo-1741332966416-414d8a5b8887?w=600&auto=format&fit=crop&q=60', alt: 'Image 1' },
     { src: 'https://images.unsplash.com/photo-1754769440490-2eb64d715775?q=80&w=1113&auto=format&fit=crop', alt: 'Image 2' },
@@ -52,8 +58,9 @@ export default function OverlayShadwayGallery({ project }) {
                 // We use Math.max(0, -rect.top) to track exactly how many pixels we've scrolled inside it.
                 const scrolledIntoWrapper = Math.max(0, -rect.top);
                 
-                // Map to 0..1 over SCROLL_TRAVEL px of scrolling
-                const progress = Math.max(0, Math.min(1, scrolledIntoWrapper / SCROLL_TRAVEL));
+                // Allow progress to exceed 1.0 so the 3D engine knows we are natively scrolling past it
+                // and can execute a smooth simultaneous 3D exit animation.
+                const progress = Math.max(0, scrolledIntoWrapper / SCROLL_TRAVEL);
                 scrollProgress.current = progress;
             }
             rafRef.current = requestAnimationFrame(tick);
@@ -76,7 +83,11 @@ export default function OverlayShadwayGallery({ project }) {
         return () => observer.disconnect();
     }, []);
 
-    const imagesToUse = project && project.title === 'Exanor' ? EXANOR_IMAGES : SAMPLE_IMAGES;
+    let imagesToUse = SAMPLE_IMAGES;
+    if (project) {
+        if (project.title === 'Exanor') imagesToUse = EXANOR_IMAGES;
+        else if (project.title === 'Recipe Sharing Portal') imagesToUse = RECIPE_IMAGES;
+    }
 
     return (
         // Tall outer wrapper — gives the overlay scroll room to "travel through" the gallery

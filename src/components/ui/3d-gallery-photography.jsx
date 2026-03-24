@@ -157,7 +157,29 @@ function GalleryScene({
         [images]
     );
 
-    const textures = useTexture(normalizedImages.map((img) => img.src));
+    // Filter out video files to avoid crashing useTexture
+    const imageSources = normalizedImages.filter(img => !img.src.match(/\.(webm|mp4)$/i)).map(img => img.src);
+    // Load static images
+    const loadedImageTextures = useTexture(imageSources);
+
+    // Create VideoTextures and merge with image textures in correct order
+    const textures = useMemo(() => {
+        let imageIndex = 0;
+        return normalizedImages.map((img) => {
+            if (img.src.match(/\.(webm|mp4)$/i)) {
+                const video = document.createElement('video');
+                video.src = img.src;
+                video.crossOrigin = 'Anonymous';
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.play().catch(e => console.warn("Video autplay prevented:", e));
+                return new THREE.VideoTexture(video);
+            } else {
+                return loadedImageTextures[imageIndex++];
+            }
+        });
+    }, [normalizedImages, loadedImageTextures]);
 
     const materials = useMemo(
         () => Array.from({ length: visibleCount }, () => createClothMaterial()),
@@ -180,7 +202,15 @@ function GalleryScene({
     }, [visibleCount]);
 
     const totalImages = normalizedImages.length;
-    const depthRange = DEFAULT_DEPTH_RANGE;
+    // Dynamically scale depth range so larger galleries have proper breathing room
+    const depthRange = Math.max(DEFAULT_DEPTH_RANGE, visibleCount * 5.5);
+    
+    // Adjust fadeOut to happen BEFORE the image hits the camera Z=10
+    // If depthRange is 132 (24 items), worldZ goes from -66 to +66.
+    // We want it perfectly visible until worldZ = 0 (10 units in front of camera),
+    // and completely invisible by worldZ = 6 (4 units in front of camera).
+    const fadeOutStartTarget = (0 + depthRange / 2) / depthRange;
+    const fadeOutEndTarget = (6 + depthRange / 2) / depthRange;
     
     // Store references to the meshes
     const meshRefs = useRef([]);
@@ -343,17 +373,17 @@ function GalleryScene({
             if (normalizedPosition < fadeSettings.fadeIn.start) opacity = 0;
             else if (normalizedPosition < fadeSettings.fadeIn.end)
                 opacity = (normalizedPosition - fadeSettings.fadeIn.start) / (fadeSettings.fadeIn.end - fadeSettings.fadeIn.start);
-            else if (normalizedPosition > fadeSettings.fadeOut.end) opacity = 0;
-            else if (normalizedPosition > fadeSettings.fadeOut.start)
-                opacity = 1 - (normalizedPosition - fadeSettings.fadeOut.start) / (fadeSettings.fadeOut.end - fadeSettings.fadeOut.start);
+            else if (normalizedPosition > fadeOutEndTarget) opacity = 0;
+            else if (normalizedPosition > fadeOutStartTarget)
+                opacity = 1 - (normalizedPosition - fadeOutStartTarget) / (fadeOutEndTarget - fadeOutStartTarget);
 
             let blur = 0;
             if (normalizedPosition < blurSettings.blurIn.start) blur = blurSettings.maxBlur;
             else if (normalizedPosition < blurSettings.blurIn.end)
                 blur = blurSettings.maxBlur * (1 - (normalizedPosition - blurSettings.blurIn.start) / (blurSettings.blurIn.end - blurSettings.blurIn.start));
-            else if (normalizedPosition > blurSettings.blurOut.end) blur = blurSettings.maxBlur;
-            else if (normalizedPosition > blurSettings.blurOut.start)
-                blur = blurSettings.maxBlur * ((normalizedPosition - blurSettings.blurOut.start) / (blurSettings.blurOut.end - blurSettings.blurOut.start));
+            else if (normalizedPosition > fadeOutEndTarget) blur = blurSettings.maxBlur;
+            else if (normalizedPosition > fadeOutStartTarget)
+                blur = blurSettings.maxBlur * ((normalizedPosition - fadeOutStartTarget) / (fadeOutEndTarget - fadeOutStartTarget));
 
             // Apply updates to the Mesh directly
             const mesh = meshRefs.current[i];

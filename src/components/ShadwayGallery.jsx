@@ -39,12 +39,11 @@ export default function ShadwayGallery() {
         const trigger = ScrollTrigger.create({
             trigger: containerRef.current,
             start: "top top",
-            end: "+=4000", // Increased duration for smoother/longer scroll
+            end: "+=4000",
             pin: true,
-            scrub: 1, // Smooth scrubbing
-            pinType: "fixed", // Force fixed coordinate pinning natively for Lenis compatibility
+            scrub: 1,
+            pinType: "fixed",
             onUpdate: (self) => {
-                // Directly update the ref without causing a re-render
                 scrollProgress.current = self.progress;
             }
         });

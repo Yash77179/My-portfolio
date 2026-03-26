@@ -93,14 +93,14 @@ export default function OverlayShadwayGallery({ project }) {
         // Tall outer wrapper — gives the overlay scroll room to "travel through" the gallery
         <div
             ref={wrapperRef}
-            style={{ height: `calc(100vh + ${SCROLL_TRAVEL}px)`, position: 'relative' }}
+            style={{ height: `calc(100dvh + ${SCROLL_TRAVEL}px)`, position: 'relative' }}
         >
             {/* Sticky inner — stays pinned to viewport-top while parent is in view */}
             <div
                 style={{
                     position: 'sticky',
                     top: 0,
-                    height: '100vh',
+                    height: '100dvh',
                     width: '100%',
                     overflow: 'hidden',
                     background: '#000',

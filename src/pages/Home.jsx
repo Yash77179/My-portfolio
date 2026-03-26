@@ -18,7 +18,7 @@ import About from '../components/About'
 import ShadwayGallery from '../components/ShadwayGallery'
 import FeaturedWork from '../components/FeaturedWork'
 import YashWork from '../components/YashWork'
-import Experience from '../components/Experience'
+
 import Testimonials from '../components/Testimonials'
 import Contact from '../components/Contact'
 import Footer from '../components/Footer'
@@ -80,7 +80,7 @@ function Home() {
 
   // Intersection Observer for Active Section
   useEffect(() => {
-    const sectionIds = ['home', 'about', 'services', 'projects', 'experience', 'contact']
+    const sectionIds = ['home', 'about', 'services', 'projects', 'contact']
     const observers = []
 
     sectionIds.forEach((id) => {
@@ -167,7 +167,7 @@ function Home() {
       <Statement />
       <About />
       <YashWork />
-      <Experience />
+
       <FeaturedWork />
       <Testimonials />
     </>

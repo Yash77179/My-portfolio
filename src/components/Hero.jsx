@@ -9,7 +9,7 @@ const Hero = React.memo(({ isDesktop, isLoading }) => {
 
     return (
         <section id="home" ref={heroRef} className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 w-full h-full z-0" style={{ width: '100vw', height: '100vh', background: '#000000' }}>
+            <div className="absolute inset-0 w-full h-full z-0" style={{ width: '100vw', height: '100dvh', background: '#000000' }}>
                 <div className="w-full h-full opacity-60"> {/* Reduced opacity for subtleties */}
                     <Silk
                         color="#1B6A73" // Premium Bluish-Green (Deep Teal)

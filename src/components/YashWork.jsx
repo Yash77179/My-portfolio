@@ -16,89 +16,82 @@ const ProjectCard = memo(function ProjectCard({ project, index, titleRef, infoRe
   return (
     <div
       onClick={() => onClick(index)}
-      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-end bg-black cursor-pointer"
+      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-center items-center bg-[#020202] cursor-pointer p-4 md:p-8 lg:p-12 pb-24"
       style={{ contain: "layout style paint" }}
     >
-      {/* Background Image - Use project image or Picsum for placeholder */}
-      <img
-        src={project.image || `https://picsum.photos/1920/1080?random=${index + 42}`}
-        alt={project.title}
-        className="absolute inset-0 w-full h-full object-cover scale-[1.02] opacity-80"
-        style={{ transform: "translateZ(0)" }}
-      />
+      <div className="relative w-full h-full overflow-hidden border border-white/10 flex flex-col justify-end bg-black group md:rounded-none rounded-sm transition-colors duration-700 hover:border-white/20">
+        
+        {/* Corner Decorators */}
+        <span className="border-[#c8b598]/60 absolute -left-px -top-px block size-4 md:size-6 border-l-2 border-t-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/60 absolute -right-px -top-px block size-4 md:size-6 border-r-2 border-t-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/60 absolute -bottom-px -left-px block size-4 md:size-6 border-b-2 border-l-2 z-20 pointer-events-none"></span>
+        <span className="border-[#c8b598]/60 absolute -bottom-px -right-px block size-4 md:size-6 border-b-2 border-r-2 z-20 pointer-events-none"></span>
 
-      {/* Elegant Gradient Overlays for Readability */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)",
-        }}
-      />
+        {/* Background Image */}
+        <img
+          src={project.image || `https://picsum.photos/1920/1080?random=${index + 42}`}
+          alt={project.title}
+          className="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-1000 group-hover:scale-[1.02]"
+          style={{ transform: "translateZ(0)" }}
+        />
 
-      {/* Massive Background Number */}
-      <div
-        className="absolute -top-10 -left-10 md:top-4 md:left-4 lg:top-12 lg:left-12 font-light tracking-tighter text-white z-0 select-none pointer-events-none"
-        style={{ fontSize: "clamp(8rem, 20vw, 18rem)", lineHeight: 0.8, opacity: 0.04 }}
-      >
-        {project.number}
-      </div>
+        {/* Elegant Gradient Overlays for Readability */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)",
+          }}
+        />
 
-      {/* Main Content Area */}
-      <div className="relative z-10 w-full px-6 md:px-16 lg:px-24 pb-12 md:pb-20 lg:pb-24 flex flex-col h-full justify-end">
-        <div className="max-w-5xl">
-          <h2
-            ref={titleRef}
-            className="font-light tracking-tight leading-[0.9] mb-8 text-white"
-            style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)" }}
-          >
-            {project.title}
-          </h2>
+        {/* Massive Background Number */}
+        <div
+          className="absolute -top-10 -left-10 md:top-4 md:left-4 lg:top-12 lg:left-12 font-light tracking-tighter text-white z-0 select-none pointer-events-none"
+          style={{ fontSize: "clamp(6rem, 15vw, 14rem)", lineHeight: 0.8, opacity: 0.04 }}
+        >
+          {project.number}
+        </div>
 
-          <div ref={infoRef} className="flex flex-col gap-6">
-            <p className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light tracking-wide leading-relaxed max-w-3xl">
-              {project.summary}
-            </p>
+        {/* Main Content Area */}
+        <div className="relative z-10 w-full px-6 md:px-12 lg:px-16 pb-10 md:pb-16 lg:pb-20 flex flex-col h-full justify-end pointer-events-none">
+          <div className="max-w-5xl pointer-events-auto">
+            <h2
+              ref={titleRef}
+              className="font-light tracking-tight leading-[0.9] mb-6 md:mb-8 text-white relative lg:-left-2"
+              style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}
+            >
+              {project.title}
+            </h2>
 
-            <div className="flex items-center gap-4 mt-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.4)]" />
-              <p className="text-sm md:text-base text-white/70 font-medium tracking-wide uppercase">{project.result}</p>
-            </div>
+            <div ref={infoRef} className="flex flex-col gap-6">
+              <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-light tracking-wide leading-relaxed max-w-3xl">
+                {project.summary}
+              </p>
 
-            <div className="flex flex-wrap gap-3 mt-6">
-              {project.stack.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-5 py-2 rounded-full text-[0.65rem] md:text-xs uppercase tracking-[0.2em] text-white/90 bg-black/40"
-                  style={{ border: "1px solid rgba(255,255,255,0.15)" }}
-                >
-                  {tag}
-                </span>
-              ))}
+              <div className="flex items-center gap-4 mt-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.4)]" />
+                <p className="text-[0.7rem] md:text-xs text-white/70 font-medium tracking-[0.1em] uppercase">{project.result}</p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 md:gap-3 mt-4 md:mt-6">
+                {project.stack.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-4 py-1.5 rounded-full text-[0.6rem] md:text-[0.65rem] uppercase tracking-[0.2em] text-white/90 bg-black/40"
+                    style={{ border: "1px solid rgba(255,255,255,0.15)" }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Navigational Arrow at Exact Bottom Right Corner */}
-      <div className="absolute right-8 bottom-12 md:right-16 md:bottom-20 z-20 flex flex-col items-center gap-4 opacity-50 hover:opacity-100 transition-opacity duration-500 cursor-pointer pointer-events-none hidden md:flex">
-        <span className="text-[0.6rem] uppercase tracking-[0.4em] font-light text-white rotate-90 translate-y-4">Next</span>
-        <svg 
-          width="50" 
-          height="50" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="white" 
-          strokeWidth="1" 
-          className="mt-6"
-        >
-          <path d="M5 12H19M19 12L12 5M19 12L12 19" />
-        </svg>
       </div>
     </div>
   );
@@ -138,7 +131,8 @@ export default function YashWork() {
     });
 
     const moveFraction = 0.85;
-    const pinTotal = totalTravel / moveFraction;
+    const pinPadding = window.innerHeight * 0.4; // Adds extra scroll distance at start
+    const pinTotal = totalTravel / moveFraction + pinPadding;
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -151,12 +145,14 @@ export default function YashWork() {
       },
     });
 
-    tl.to(track, { x: -totalTravel, ease: "none", duration: 1 }, 0);
+    // Animate track (starts after 0.2 'delay' in scrub so it stays pinned temporarily)
+    tl.to({}, { duration: 0.1 });
+    tl.to(track, { x: -totalTravel, ease: "none", duration: 0.9 }, 0.1);
 
     for (let i = 1; i < numCards; i++) {
       const title = titleRefs.current[i];
       const info = infoRefs.current[i];
-      const entryProgress = (i - 0.6) / (numCards - 1);
+      const entryProgress = (i - 0.6) / (numCards - 1) * 0.9 + 0.1;
 
       if (title) {
         tl.to(title, { yPercent: 0, opacity: 1, ease: "power3.out", duration: 0.25 }, entryProgress);
@@ -176,14 +172,20 @@ export default function YashWork() {
       ref={sectionRef}
       className="overflow-hidden relative bg-black"
       id="projects-gallery"
-      style={{ height: "100vh" }}
+      style={{ height: "100dvh" }}
     >
-      {/* Top Left Label */}
-      <div className="absolute top-10 left-6 md:top-14 md:left-16 z-30 mix-blend-difference pointer-events-none">
-        <div className="flex items-center gap-6">
+      {/* Bottom Left Label (Moved from Top Left to prevent overlap) */}
+      <div className="absolute bottom-6 left-6 md:bottom-10 md:left-12 lg:left-16 z-30 mix-blend-difference pointer-events-none">
+        <div className="flex items-center gap-4 md:gap-6">
           <p className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] text-white/70 font-light">Selected Work</p>
-          <span className="h-px w-12 md:w-20 bg-white/30" />
+          <span className="h-px w-8 md:w-16 bg-white/30" />
         </div>
+      </div>
+      
+      {/* Navigational Arrow at Bottom Right Pattern */}
+      <div className="absolute right-6 bottom-6 md:right-12 md:bottom-10 lg:right-16 z-30 flex items-center gap-4 opacity-70 pointer-events-none mix-blend-difference">
+        <span className="h-px w-8 md:w-16 bg-white/30" />
+        <span className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] font-light text-white/70">Scroll</span>
       </div>
 
       <div

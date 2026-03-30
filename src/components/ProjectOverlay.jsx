@@ -87,13 +87,29 @@ function PremiumProjectContent({
           </div>
 
           <div className="overflow-hidden">
-            <div className="hero-anim flex flex-col md:flex-row md:items-center gap-6 md:gap-12 mt-8">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.4)]" />
-                <p className="text-sm tracking-[0.2em] text-white/70 uppercase">Design & Engineering</p>
+            <div className="hero-anim flex flex-col md:flex-row md:items-start lg:items-center gap-8 md:gap-12 mt-8">
+              <div className="flex flex-col gap-6 shrink-0">
+                  <div className="flex items-center gap-4">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.4)]" />
+                    <p className="text-sm tracking-[0.2em] text-white/70 uppercase">Design & Engineering</p>
+                  </div>
+                  {project.link && (
+                     <a 
+                       href={project.link} 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       className="pointer-events-auto inline-flex items-center justify-center gap-4 px-8 py-3.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white hover:border-white/40 text-[0.65rem] font-semibold tracking-[0.25em] uppercase transition-all duration-300 group w-max"
+                     >
+                         <span>{project.title.toLowerCase().includes('exanor') ? 'View on Play Store' : 'Launch Project'}</span>
+                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">
+                             <path d="M7 17L17 7M17 7H7M17 7V17" />
+                         </svg>
+                     </a>
+                  )}
               </div>
-              <div className="hidden md:block w-12 h-px bg-white/20" />
-              <p className="text-xl md:text-2xl font-light text-white/90 max-w-xl leading-relaxed">
+              
+              <div className="hidden lg:block w-12 h-px bg-white/20" />
+              <p className="text-lg md:text-xl lg:text-2xl font-light text-white/90 max-w-xl leading-relaxed">
                 {project.summary}
               </p>
             </div>

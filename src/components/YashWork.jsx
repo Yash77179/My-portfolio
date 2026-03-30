@@ -16,7 +16,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, titleRef, infoRe
   return (
     <div
       onClick={() => onClick(index)}
-      className="relative w-screen h-screen shrink-0 overflow-hidden flex flex-col justify-center items-center bg-[#020202] cursor-pointer p-4 md:p-8 lg:p-12 pb-24"
+      className="relative w-screen h-[100dvh] shrink-0 overflow-hidden flex flex-col justify-center items-center bg-[#020202] cursor-pointer px-1 py-4 md:p-8 lg:p-12 pb-24"
       style={{ contain: "layout style paint" }}
     >
       <div className="relative w-full h-full overflow-hidden border border-white/10 flex flex-col justify-end bg-black group md:rounded-none rounded-sm transition-colors duration-700 hover:border-white/20">
@@ -145,9 +145,12 @@ export default function YashWork() {
       },
     });
 
+    // We use xPercent to mathematically guarantee it ends precisely on the last card, immune to screen resizing
+    const xMovePercent = -100 * ((numCards - 1) / numCards);
+
     // Animate track (starts after 0.2 'delay' in scrub so it stays pinned temporarily)
     tl.to({}, { duration: 0.1 });
-    tl.to(track, { x: -totalTravel, ease: "none", duration: 0.9 }, 0.1);
+    tl.to(track, { xPercent: xMovePercent, ease: "none", duration: 0.9 }, 0.1);
 
     for (let i = 1; i < numCards; i++) {
       const title = titleRefs.current[i];
@@ -172,20 +175,30 @@ export default function YashWork() {
       ref={sectionRef}
       className="overflow-hidden relative bg-black"
       id="projects-gallery"
-      style={{ height: "100dvh" }}
+      style={{ height: "100dvh", touchAction: "pan-y" }}
     >
-      {/* Bottom Left Label (Moved from Top Left to prevent overlap) */}
-      <div className="absolute bottom-6 left-6 md:bottom-10 md:left-12 lg:left-16 z-30 mix-blend-difference pointer-events-none">
-        <div className="flex items-center gap-4 md:gap-6">
-          <p className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] text-white/70 font-light">Selected Work</p>
-          <span className="h-px w-8 md:w-16 bg-white/30" />
+      {/* Premium Architectural Header - Top Right (Safe Zone) */}
+      <div className="absolute top-28 right-6 md:top-32 md:right-12 lg:right-16 z-30 pointer-events-none flex flex-col justify-start items-end text-right">
+        {/* Ambient massive 03 background */}
+        <div className="absolute top-[-10%] right-0 z-0 pointer-events-none select-none text-white/[0.03] font-light" style={{ fontSize: "clamp(12rem, 30vw, 35rem)", lineHeight: 0.75, letterSpacing: "-0.05em" }}>
+            03
+        </div>
+        
+        <div className="relative z-10 flex flex-col items-end pointer-events-none">
+            <div className="flex items-center gap-4 mb-2 md:mb-4 pointer-events-none">
+                <h3 className="text-[0.65rem] uppercase tracking-[0.4em] text-[#c8b598]/80 font-medium select-none">Portfolio</h3>
+                <span className="w-12 h-px bg-[#c8b598]/50"></span>
+            </div>
+            <h2 className="text-white text-4xl md:text-6xl lg:text-[7rem] font-light tracking-tighter leading-[0.9] pointer-events-none select-none">
+                Selected <br className="hidden md:block" /> <span className="font-serif italic text-white/40">Work</span>
+            </h2>
         </div>
       </div>
       
-      {/* Navigational Arrow at Bottom Right Pattern */}
+      {/* Navigational Arrow restored at Bottom Right to instruct users to scroll vertically */}
       <div className="absolute right-6 bottom-6 md:right-12 md:bottom-10 lg:right-16 z-30 flex items-center gap-4 opacity-70 pointer-events-none mix-blend-difference">
         <span className="h-px w-8 md:w-16 bg-white/30" />
-        <span className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] font-light text-white/70">Scroll</span>
+        <span className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.4em] font-light text-white/70 tracking-widest">Scroll</span>
       </div>
 
       <div

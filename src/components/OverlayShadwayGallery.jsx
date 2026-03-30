@@ -17,6 +17,12 @@ const RECIPE_IMAGES = Object.values(recipeModules).map((mod, index) => ({
     alt: `Recipe Sharing Screenshot ${index + 1}`
 }));
 
+const deadlockModules = import.meta.glob('../assets/deadlock-simulator/*.{png,jpg,jpeg,webp}', { eager: true });
+const DEADLOCK_IMAGES = Object.values(deadlockModules).map((mod, index) => ({
+    src: mod.default,
+    alt: `Deadlock Simulator Screenshot ${index + 1}`
+}));
+
 const SAMPLE_IMAGES = [
     { src: 'https://images.unsplash.com/photo-1741332966416-414d8a5b8887?w=600&auto=format&fit=crop&q=60', alt: 'Image 1' },
     { src: 'https://images.unsplash.com/photo-1754769440490-2eb64d715775?q=80&w=1113&auto=format&fit=crop', alt: 'Image 2' },
@@ -87,6 +93,7 @@ export default function OverlayShadwayGallery({ project }) {
     if (project) {
         if (project.title === 'Exanor') imagesToUse = EXANOR_IMAGES;
         else if (project.title === 'Recipe Sharing Portal') imagesToUse = RECIPE_IMAGES;
+        else if (project.title === 'Deadlock Detection Simulator') imagesToUse = DEADLOCK_IMAGES;
     }
 
     return (

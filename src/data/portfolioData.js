@@ -61,7 +61,7 @@ export const projects = [
         galleryVideo2: recipeVideo2,
         galleryVideo3: recipeVideo3,
         summary: 'A community-driven web platform where people can create, publish, discover, and save recipes in a clean, searchable experience. Designed to make home cooking easier by turning scattered cooking knowledge into a structured system.',
-        stack: ['React', 'TypeScript', 'Node.js', 'Express.js', 'MongoDB', 'Cloud Storage'],
+        stack: ['React', 'Node.js', 'Express.js', 'MongoDB', 'Cloud Storage'],
         result: 'Structured cooking workflows, improving recipe discovery speed and user retention through saved collections.',
         timeline: '2025',
         coreFocus: ['Content Architecture', 'Search & Filtering', 'Community Trust', 'Personalized Feed'],

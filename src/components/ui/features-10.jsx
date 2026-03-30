@@ -90,17 +90,17 @@ export function Features({ project }) {
                     </div>
                 </div>
 
-                {/* ── Optional Box 5: The Friction (Minimalist, Massive, No Paragraph) ── */}
+                {/* ── Optional Box 5: The Friction (Project Specific Problem) ── */}
                 {project.problem && (
                     <div className="lg:col-span-12 group relative border border-white/10 bg-[#050505] p-10 md:p-20 flex flex-col justify-center items-center text-center overflow-hidden transition-colors duration-700 hover:bg-white/[0.02] min-h-[40vh]">
                         <PixelCanvas gap={8} speed={40} colors={["#ffffffaa", "#00e5ffaa", "#38bdf8aa", "#e0f2feaa", "#a5f3fcaa"]} variant="default" className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" />
                         <CardDecorator />
-                        <div className="relative z-10 max-w-4xl mx-auto">
+                        <div className="relative z-10 max-w-5xl mx-auto">
                             <span className="text-[0.65rem] uppercase tracking-[0.4em] font-medium text-white/50 block mb-6 group-hover:text-white transition-colors duration-700">
                                 The Operational Friction
                             </span>
-                            <h4 className="text-4xl md:text-6xl font-light text-white tracking-tighter leading-[1.1] transition-transform duration-1000 group-hover:scale-[0.98]">
-                                Disconnected tools destroy trust.
+                            <h4 className="text-3xl md:text-5xl lg:text-5xl font-light text-white/90 tracking-tighter leading-[1.3] transition-transform duration-1000 group-hover:scale-[0.98]">
+                                "{project.problem}"
                             </h4>
                         </div>
                     </div>
@@ -123,11 +123,13 @@ export function Features({ project }) {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 w-full mb-4">
-                            {project.solutionList.map((sol, idx) => (
+                            {project.solutionList.map((sol, idx) => {
+                                const photoIndex = (idx + project.title.charCodeAt(0) + project.title.length) % U_IMAGES.length;
+                                return (
                                 <ExpandableCard
                                     key={idx}
                                     title={sol.name}
-                                    src={U_IMAGES[idx % U_IMAGES.length]}
+                                    src={U_IMAGES[photoIndex]}
                                     description={`Core Module 0${idx+1}`}
                                     className="border-white/[0.05]"
                                 >
@@ -135,22 +137,17 @@ export function Features({ project }) {
                                     <p className="border-l border-white/20 pl-6 text-white/60 mb-8 font-light leading-relaxed">
                                         {sol.desc}
                                     </p>
-                                    <p className="text-white/50 font-light leading-relaxed">
-                                        This infrastructure module was engineered specifically to address deep operational fragmentation. By fundamentally restructuring how state is handled across {sol.name.toLowerCase()}, the application logic achieves absolute realtime synchronization with zero manual reconciliation overhead.
+                                    <p className="text-white/50 font-light leading-relaxed mb-6">
+                                        {project.notes && project.notes[idx] ? project.notes[idx] : `Engineered specifically to address the core requirements of ${sol.name.toLowerCase()}, optimizing resource utilization and state synchronization.`}
                                     </p>
-                                    <h4 className="text-white font-medium text-2xl tracking-tight mt-10 mb-2">System Advantages</h4>
                                     <ul className="flex flex-col gap-4">
                                         <li className="flex items-start gap-4">
-                                            <span className="text-white/20 mt-1">✦</span>
-                                            <span className="text-white/50 font-light">Eliminated latency between point-of-sale systems and central database edge nodes.</span>
-                                        </li>
-                                        <li className="flex items-start gap-4">
-                                            <span className="text-white/20 mt-1">✦</span>
-                                            <span className="text-white/50 font-light">Built-in robust fault tolerance, guaranteeing strictly consistent rollbacks on network failure.</span>
+                                            <span className="text-[#c8b598]/80 mt-1">✦</span>
+                                            <span className="text-white/60 font-light">Custom architecture developed for maximum scalability and strict typing bounds.</span>
                                         </li>
                                     </ul>
                                 </ExpandableCard>
-                            ))}
+                            )})}
                         </div>
                     </div>
                 )}
@@ -158,7 +155,7 @@ export function Features({ project }) {
                 {/* ── Optional Box 7/8: Ecosystem & AI Split (Structural & Professional) ── */}
                 {project.ecosystem && (
                     <>
-                        <div className="lg:col-span-8 group relative border border-white/10 bg-[#050505] hover:bg-white/[0.02] transition-colors duration-700 p-10 md:p-16 overflow-hidden min-h-[400px] flex flex-col justify-between">
+                        <div className={`${project.aiFeatures && project.aiFeatures.length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'} group relative border border-white/10 bg-[#050505] hover:bg-white/[0.02] transition-colors duration-700 p-10 md:p-16 overflow-hidden min-h-[400px] flex flex-col justify-between`}>
                             <PixelCanvas gap={8} speed={40} colors={["#ffffffaa", "#00e5ffaa", "#38bdf8aa", "#e0f2feaa", "#a5f3fcaa"]} variant="default" className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" />
                             <CardDecorator />
                             <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.3em] font-medium text-white/30 block mb-12">
@@ -181,24 +178,26 @@ export function Features({ project }) {
                             </div>
                         </div>
 
+                        {project.aiFeatures && project.aiFeatures.length > 0 && (
                         <div className="lg:col-span-4 flex flex-col">
                             {/* AI Integration - Monochrome Inversion Tags */}
                             <div className="group relative border border-white/10 bg-[#050505] hover:bg-white/[0.02] transition-colors duration-700 p-10 md:p-14 flex-grow overflow-hidden flex flex-col justify-center h-full">
                                 <PixelCanvas gap={8} speed={40} colors={["#ffffffaa", "#00e5ffaa", "#38bdf8aa", "#e0f2feaa", "#a5f3fcaa"]} variant="default" className="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen" />
                                 <CardDecorator />
-                                <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.3em] font-medium text-white/30 block mb-10">
+                                <span className="relative z-10 text-[0.65rem] uppercase tracking-[0.3em] font-medium text-[white]/30 block mb-10">
                                     08. Smart Core
                                 </span>
                                 
                                 <div className="flex flex-wrap gap-2 relative z-10">
-                                    {project.aiFeatures && project.aiFeatures.map((ai, idx) => (
-                                        <div key={idx} className="px-4 py-2.5 border border-white/10 bg-transparent hover:bg-white text-white/50 hover:text-black transition-all duration-500 rounded-full cursor-default text-[0.65rem] uppercase tracking-widest font-medium">
+                                    {project.aiFeatures.map((ai, idx) => (
+                                        <div key={idx} className="px-4 py-2.5 border border-white/10 bg-transparent hover:bg-white hover:text-black text-white/50 transition-all duration-500 rounded-full cursor-default text-[0.65rem] uppercase tracking-widest font-medium">
                                             {ai}
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
+                        )}
                     </>
                 )}
 

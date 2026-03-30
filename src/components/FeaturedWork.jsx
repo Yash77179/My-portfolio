@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CircularTestimonials from './ui/circular-testimonials';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // Local Image Assets
 import certCoursera from '../assets/certificates/1.jpg';
@@ -31,8 +36,20 @@ const certificates = [
 ];
 
 const FeaturedWork = () => {
+    const containerRef = useRef(null);
+
+    useGSAP(() => {
+        ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: "top top",
+            end: "+=125%", // Forces the scroll to "stop for a sec" (pins for 1.25x viewport height)
+            pin: true,
+            pinSpacing: true,
+        });
+    }, { scope: containerRef });
+
     return (
-        <section id="featured-work" className="relative w-full h-screen bg-black flex flex-col items-center justify-center overflow-hidden">
+        <section ref={containerRef} id="featured-work" className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden" style={{ height: "100dvh" }}>
             {/* Background Texture - Subtle Grain */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-0"></div>
 
@@ -41,7 +58,7 @@ const FeaturedWork = () => {
                 04
             </div>
             
-            <div className="w-full h-full max-w-[1536px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col justify-center relative z-10 pt-24 md:pt-32 pb-16">
+            <div className="w-full h-full max-w-[1536px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col justify-center relative z-10 pt-24 pb-16">
                 {/* Section Header */}
                 <div className="w-full mb-auto">
                     <div className="flex items-center gap-4 mb-4 md:mb-6">

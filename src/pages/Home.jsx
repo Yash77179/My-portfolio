@@ -14,13 +14,14 @@ import BackgroundEffects from '../components/BackgroundEffects'
 import CustomCursor from '../components/CustomCursor'
 import React from 'react'
 import Statement from '../components/Statement'
+import TechStack from '../components/TechStack'
 import About from '../components/About'
-import ShadwayGallery from '../components/ShadwayGallery'
+
 import FeaturedWork from '../components/FeaturedWork'
 import YashWork from '../components/YashWork'
 
 import Testimonials from '../components/Testimonials'
-import Contact from '../components/Contact'
+
 import Footer from '../components/Footer'
 
 
@@ -165,6 +166,7 @@ function Home() {
   const staticContent = React.useMemo(() => (
     <>
       <Statement />
+      <TechStack />
       <About />
       <YashWork />
 
@@ -204,8 +206,8 @@ function Home() {
             <main>
               <Hero isDesktop={isDesktop} isLoading={!isPhysicsReady} />
               {staticContent}
-              <Contact activeSection={activeSection} isDesktop={isDesktop} />
-              <ShadwayGallery />
+
+
               <Footer />
             </main>
           </m.div>

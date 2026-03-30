@@ -91,8 +91,8 @@ const About = () => {
             <ContainerScroll
                 titleComponent={
                     <div className="flex flex-col items-center justify-center mb-10 relative z-10">
-                        <span className="text-[10rem] md:text-[15rem] font-bold text-white/15 leading-none absolute -top-20 md:-top-32 select-none">
-                            01
+                        <span className="text-[10rem] md:text-[15rem] font-bold text-white/15 leading-none absolute -top-20 md:-top-32 select-none pointer-events-none">
+                            02
                         </span>
                         <h2 className="text-4xl md:text-7xl font-medium tracking-tight text-white relative z-10">
                             The Architect
@@ -127,7 +127,7 @@ const About = () => {
                         {/* Top Label - Permanently Visible */}
                         <div className="relative z-10 w-full flex justify-center">
                             <span className="text-[0.6rem] md:text-xs uppercase tracking-[0.5em] text-white/50 font-medium">
-                                Interactive Session — 01
+                                Interactive Session — 02
                             </span>
                         </div>
                         

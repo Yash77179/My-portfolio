@@ -34,7 +34,10 @@ const Footer = () => {
                         <ul className="flex flex-col gap-5 text-white/90 text-[16px] tracking-wide font-light">
                             {['Home', 'About', 'Projects', 'Contact'].map(item => (
                                 <li key={item}>
-                                    <a href={`#${item.toLowerCase()}`} className="hover:text-white transition-colors duration-300 drop-shadow-md">
+                                    <a 
+                                        href={item === 'Contact' ? 'mailto:yashbhosale8329@gmail.com' : `#${item.toLowerCase()}`} 
+                                        className="hover:text-white transition-colors duration-300 drop-shadow-md"
+                                    >
                                         {item}
                                     </a>
                                 </li>
@@ -46,10 +49,14 @@ const Footer = () => {
                     <div className="p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10">
                         <h3 className="text-xs tracking-[0.2em] text-white/50 uppercase mb-8 font-semibold drop-shadow-md">Socials</h3>
                         <ul className="flex flex-col gap-5 text-white/90 text-[16px] tracking-wide font-light">
-                            {['LinkedIn', 'GitHub', 'Behance', 'Dribbble'].map(item => (
-                                <li key={item}>
-                                    <a href="#" className="hover:text-white transition-colors duration-300 drop-shadow-md">
-                                        {item}
+                            {[
+                                { name: 'LinkedIn', url: 'https://www.linkedin.com/in/yash-patil-dev' },
+                                { name: 'GitHub', url: 'https://github.com/Yash77179' },
+                                { name: 'LeetCode', url: 'https://leetcode.com/u/yash7717/' }
+                            ].map(item => (
+                                <li key={item.name}>
+                                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-300 drop-shadow-md">
+                                        {item.name}
                                     </a>
                                 </li>
                             ))}
@@ -60,10 +67,20 @@ const Footer = () => {
                     <div className="p-8 md:p-12 border-b md:border-b-0 border-white/10">
                         <h3 className="text-xs tracking-[0.2em] text-white/50 uppercase mb-8 font-semibold drop-shadow-md">Resources</h3>
                         <ul className="flex flex-col gap-5 text-white/90 text-[16px] tracking-wide font-light">
-                            {['Resume', 'Case Studies', 'Components', 'Privacy'].map(item => (
-                                <li key={item}>
-                                    <a href="#" className="hover:text-white transition-colors duration-300 drop-shadow-md">
-                                        {item}
+                            {[
+                                { name: 'Resume', url: 'https://cv-f10ffb.tiiny.site/' },
+                                { name: 'Case Studies', url: '#' },
+                                { name: 'Components', url: '#' },
+                                { name: 'Privacy', url: '#' }
+                            ].map(item => (
+                                <li key={item.name}>
+                                    <a 
+                                        href={item.url} 
+                                        target={item.url !== '#' ? "_blank" : undefined} 
+                                        rel={item.url !== '#' ? "noopener noreferrer" : undefined} 
+                                        className="hover:text-white transition-colors duration-300 drop-shadow-md"
+                                    >
+                                        {item.name}
                                     </a>
                                 </li>
                             ))}
